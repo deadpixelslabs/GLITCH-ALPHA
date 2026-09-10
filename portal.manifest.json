@@ -1,0 +1,40 @@
+{
+  "app": "DEAD PIXELS PORTAL",
+  "version": "3.7.0",
+  "chainId": 4663,
+  "protocolFeeBps": 0,
+  "modules": {
+    "v3.0": "UNIFIED PORTAL UI",
+    "v3.1": "STOCK TOKEN REGISTRY + MARKET SCANNER",
+    "v3.2": "FAIR VALUE ENGINE + GLITCH SCORE",
+    "v3.3": "STOCK-TO-STOCK",
+    "v3.4": "PORTFOLIO BUILDER + REBALANCER",
+    "v3.5": "WAIT FOR BETTER + EXECUTION ORDERS",
+    "v3.6": "ANALYTICS (PERSISTENT BUILD EXISTS SEPARATELY)",
+    "v3.7": "GLITCH ALPHA // REAL-TIME TOKEN INTELLIGENCE"
+  },
+  "glitchAlpha": {
+    "scope": "ALL ERC-20 TOKENS ON ROBINHOOD CHAIN",
+    "discovery": [
+      "DIRECT ONCHAIN ZERO-ADDRESS MINT SIGNALS",
+      "GECKOTERMINAL NEW POOLS",
+      "BLOCKSCOUT HISTORICAL TOKEN INDEX"
+    ],
+    "marketData": [
+      "GECKOTERMINAL",
+      "DEXSCREENER"
+    ],
+    "enrichment": [
+      "BLOCKSCOUT HOLDERS",
+      "BLOCKSCOUT VERIFIED SOURCE/ABI",
+      "ROBINHOOD RPC"
+    ],
+    "polling": {
+      "justBornMs": 8000,
+      "marketOverviewMs": 30000
+    },
+    "riskNotice": "Signal-based risk model; not a safety guarantee or investment recommendation."
+  },
+  "executionOrderMode": "CLIENT_WATCH_WALLET_CONFIRMATION_REQUIRED",
+  "stockFairValueSource": "ROBINHOOD_RHJ_BID_ASK_X_CURRENT_MULTIPLIER"
+}

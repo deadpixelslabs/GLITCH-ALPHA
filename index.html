@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>DEAD PIXELS PORTAL V3.7 — GLITCH ALPHA</title>
+<meta name="description" content="DEAD PIXELS PORTAL V3.7 // GLITCH ALPHA real-time token intelligence, unified execution, Stock Token engine, portfolio tools and 0% protocol fee routing on Robinhood Chain.">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64"/><rect x="9" y="9" width="46" height="46" fill="none" stroke="%23c3ff23" stroke-width="4"/><rect x="23" y="23" width="18" height="18" fill="%23c3ff23"/></svg>'>
+<style>
+:root{
+  --bg:#000;--panel:rgba(8,8,8,.93);--ink:#f0efe9;--muted:#84847f;
+  --line:#2b2b28;--acid:#c3ff23;--red:#ff2c54;--cyan:#13e5ff;--shadow:#050505;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#000;color:var(--ink)}
+body{font-family:"Courier New",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:hidden}
+button,input,select{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
+::selection{background:var(--acid);color:#000}
+
+#stage{position:fixed;inset:0;z-index:0;background:#000;overflow:hidden}
+#voidCanvas{position:absolute;inset:0;width:100%;height:100%}
+.scanlines{position:absolute;inset:0;pointer-events:none;opacity:.17;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px)}
+.vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 29% 49%,transparent 0 18%,rgba(0,0,0,.08) 31%,rgba(0,0,0,.55) 70%,rgba(0,0,0,.94) 100%)}
+.noise{position:absolute;inset:-80px;pointer-events:none;opacity:.055;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:noise .2s steps(2) infinite}
+@keyframes noise{25%{transform:translate(-1.5%,1%)}50%{transform:translate(1%,-1.5%)}75%{transform:translate(1.5%,1.5%)}}
+
+.chrome{position:fixed;left:0;right:0;top:0;height:52px;z-index:30;border-bottom:1px solid rgba(255,255,255,.13);background:rgba(0,0,0,.76);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700}
+.brand .sig{width:9px;height:9px;background:var(--acid);box-shadow:-5px 0 0 var(--red),5px 0 0 var(--cyan)}
+.net{display:flex;align-items:center;gap:8px;color:#a1a19b}
+.net i{width:6px;height:6px;background:var(--acid);box-shadow:0 0 12px var(--acid);animation:blink 1.2s steps(1) infinite}
+@keyframes blink{50%{opacity:.25}}
+
+.page{position:relative;z-index:10;min-height:100svh;padding:88px 26px 42px;display:grid;grid-template-columns:minmax(250px,1fr) minmax(520px,690px);gap:36px;align-items:center;max-width:1240px;margin:0 auto}
+.hero{padding:24px 0 40px}
+.kicker{font-size:10px;color:#8b8b84;letter-spacing:.28em;text-transform:uppercase;margin-bottom:16px}
+.hero h1{font-family:Arial Black,Impact,sans-serif;font-size:clamp(52px,7.2vw,104px);line-height:.78;letter-spacing:-.075em;text-transform:uppercase;margin:0;max-width:610px}
+.hero h1 em{font-style:normal;color:var(--acid);position:relative}
+.hero h1 em:after{content:"ROUTER";position:absolute;left:3px;top:2px;color:var(--cyan);opacity:.14;clip-path:inset(58% 0 18% 0)}
+.hero p{max-width:520px;margin:24px 0 0;color:#a4a49e;font-size:12px;line-height:1.75}
+.hero-grid{margin-top:30px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));max-width:520px;border:1px solid var(--line)}
+.hero-grid div{padding:13px;border-right:1px solid var(--line);background:rgba(0,0,0,.54)}
+.hero-grid div:last-child{border-right:0}
+.hero-grid small{display:block;color:#70706b;font-size:8px;letter-spacing:.12em;margin-bottom:5px}
+.hero-grid b{font-size:10px;color:#dddcd5}
+.protocol-zero{color:var(--acid)!important}
+
+.swap-shell{position:relative;background:var(--panel);border:1px solid #3a3a36;box-shadow:16px 16px 0 rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.025) inset;overflow:hidden}
+.swap-shell:before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.015) 0 1px,transparent 1px 4px)}
+.windowbar{height:34px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:9px;letter-spacing:.12em;color:#aaa9a3;position:relative;z-index:2}
+.windowbar .dots{display:flex;gap:5px}.windowbar .dots i{width:7px;height:7px;border:1px solid #777;display:block}.windowbar .dots i:first-child{background:var(--acid);border-color:var(--acid)}
+.swap{padding:20px;position:relative;z-index:2}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}
+.pair-buttons{display:flex;gap:6px;flex-wrap:wrap}
+.mini,.wallet-btn,.action,.reverse{border:1px solid #41413d;background:#090909;color:#d8d7d1;padding:8px 10px;font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+.mini:hover,.wallet-btn:hover{border-color:#808078}
+.mini.active{border-color:var(--acid);color:var(--acid)}
+.wallet-btn{white-space:nowrap;background:#111}
+.wallet-btn.connected{color:var(--acid);border-color:#536c19}
+
+.holder-gate{
+ display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:11px;
+ border:1px solid #3a3a36;background:#080808;padding:11px 12px;margin-bottom:13px;
+ position:relative;overflow:hidden
+}
+.holder-gate:after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,#555,transparent)}
+.holder-gate.granted{border-color:#607c19;background:linear-gradient(90deg,rgba(195,255,35,.075),#080808 45%)}
+.holder-gate.denied{border-color:#662438;background:linear-gradient(90deg,rgba(255,44,84,.06),#080808 45%)}
+.holder-gate-icon{width:34px;height:34px;border:1px solid #353531;display:grid;place-items:center;font-size:15px}
+.holder-gate small{display:block;color:#696963;font-size:7px;letter-spacing:.13em;margin-bottom:4px}
+.holder-gate b{display:block;font-size:10px;letter-spacing:.04em}
+.holder-gate span{display:block;color:#777770;font-size:8px;margin-top:4px}
+.holder-gate.granted span{color:var(--acid)}
+.holder-gate.denied span{color:#ff6f88}
+.holder-gate-badge{border:1px solid #3e3e39;padding:6px 7px;font-size:8px;color:#777}
+.holder-gate.granted .holder-gate-badge{border-color:var(--acid);color:#000;background:var(--acid);font-weight:700}
+.holder-gate.denied .holder-gate-badge{border-color:#8b2940;color:#ff6f88}
+.locked-control{opacity:.43;pointer-events:none;filter:saturate(.45)}
+
+.tokenbox{border:1px solid #343431;background:#050505;padding:14px;margin-top:8px;transition:border-color .15s}
+.tokenbox:focus-within{border-color:#62625b}
+.tokenbox-head{display:flex;justify-content:space-between;align-items:center;color:#77776f;font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.balance-btn{border:0;background:none;padding:0;color:#8f8f88;font-size:9px}
+.balance-btn:hover{color:var(--acid)}
+.tokenrow{display:grid;grid-template-columns:1fr 170px;gap:10px;align-items:center}
+.amount{width:100%;border:0;outline:0;background:transparent;color:#f3f2ec;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:34px;letter-spacing:-.04em;min-width:0}
+.amount::placeholder{color:#3b3b38}
+.token-select{border:1px solid #464641;background:#10100f;color:#efeee8;padding:12px 9px;outline:none;font-weight:700;font-size:11px;width:100%}
+.token-search-row{margin:0 0 9px}.token-search{width:100%;border:1px solid #252522;background:#070707;color:#bfc0b8;padding:8px 10px;outline:none;font-size:9px;letter-spacing:.05em}.token-search:focus{border-color:#595950}.token-search::placeholder{color:#4f4f4a}
+.custom-wrap{display:none;margin-top:9px}.custom-wrap.show{display:block}
+.custom-address{width:100%;background:#090909;color:#ddd;border:1px solid #353531;padding:10px;outline:none;font-size:10px}
+.custom-meta{font-size:9px;color:#74746e;margin-top:6px;min-height:12px}
+.reverse-wrap{height:20px;display:flex;justify-content:center;align-items:center;position:relative;z-index:3}
+.reverse{width:38px;height:38px;padding:0;border-radius:50%;font-size:17px;background:#0a0a09;color:var(--acid)}
+.out-amount{font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:34px;letter-spacing:-.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#e9e8e1}
+.slippage{display:flex;align-items:center;justify-content:space-between;padding:14px 0 8px;color:#86867f;font-size:9px;text-transform:uppercase;letter-spacing:.1em}
+.slippage select{background:#080808;color:#ddd;border:1px solid #343431;padding:6px 7px;outline:none;font-size:9px}
+.baseline-panel{
+ display:flex;align-items:center;justify-content:space-between;gap:10px;
+ margin-top:9px;padding:9px 10px;border:1px solid #2d2d29;background:#070707;
+ font-size:8px;letter-spacing:.08em
+}
+.baseline-panel span{color:#66665f}
+.baseline-panel b{color:#c6c5bd;text-align:right}
+.baseline-panel.saved{border-color:#536c19;background:linear-gradient(90deg,rgba(195,255,35,.06),#070707)}
+.baseline-panel.saved b{color:var(--acid)}
+.baseline-panel.baseline-best{border-color:#464641}
+
+.quote-panel{border-top:1px dashed #343431;margin-top:9px;padding-top:13px;min-height:103px}
+.empty{color:#565652;font-size:10px;line-height:1.6;text-align:center;padding:19px 10px}
+.quote{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;padding:10px;border:1px solid #2f2f2c;margin-bottom:7px;background:#080808}
+.quote.best{border-color:#586f1d;background:linear-gradient(90deg,rgba(195,255,35,.055),#080808 45%)}
+.qleft b{display:flex;align-items:center;gap:7px;font-size:10px;letter-spacing:.07em}.badge{font-size:7px;background:var(--acid);color:#000;padding:2px 4px}
+.qleft small{display:block;color:#66665f;font-size:8px;margin-top:5px}
+.qright{text-align:right}.qright b{font-family:Arial,Helvetica,sans-serif;font-size:15px}.qright small{display:block;color:#6e6e68;font-size:8px;margin-top:4px}
+.action{width:100%;margin-top:13px;padding:14px;background:var(--acid);color:#050505;border-color:var(--acid);font-family:Arial Black,Arial,sans-serif;font-size:12px;font-weight:900}
+.action:hover{filter:brightness(1.06)}.action:disabled{cursor:not-allowed;background:#1c1c19;border-color:#31312d;color:#5f5f59}
+.statuslog{margin-top:11px;min-height:18px;font-size:9px;color:#898982;line-height:1.55}
+.statuslog.ok{color:var(--acid)}.statuslog.err{color:#ff6680}
+.details{margin-top:15px;border-top:1px solid #292926;padding-top:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.details div{background:#050505;border:1px solid #252522;padding:9px}
+.details small{display:block;font-size:7px;color:#66665f;letter-spacing:.08em;margin-bottom:4px}.details b{font-size:9px;color:#bdbcb5}
+.rwa{display:none;margin-top:10px;padding:9px;border-left:2px solid #d2a436;background:#171307;color:#bba66a;font-size:8px;line-height:1.55}.rwa.show{display:block}
+.footerline{position:fixed;z-index:25;bottom:12px;left:18px;right:18px;display:flex;justify-content:space-between;color:#54544f;font-size:8px;letter-spacing:.11em;text-transform:uppercase;pointer-events:none}
+.glitchline{position:fixed;z-index:5;left:-5%;right:-5%;height:2px;top:64%;opacity:0;background:linear-gradient(90deg,transparent,var(--cyan),transparent 35%,var(--red),transparent);animation:tear 6.8s steps(1) infinite}
+@keyframes tear{0%,91%,100%{opacity:0;transform:translateX(0)}92%{opacity:.5;transform:translateX(3%)}93%{opacity:.8;top:41%;transform:translateX(-2%)}94%{opacity:0}}
+@media(max-width:940px){
+ .page{grid-template-columns:1fr;padding-top:78px;max-width:730px;align-items:start}
+ .hero{padding-bottom:0}.hero h1{font-size:clamp(52px,15vw,86px)}
+ .hero p{margin-top:18px}.hero-grid{margin-top:20px}
+ .footerline{position:relative;margin:20px 18px 16px;left:auto;right:auto;bottom:auto}
+}
+@media(max-width:590px){
+ .chrome{padding:0 11px}.brand{font-size:8px}.net span{display:none}
+ .page{padding:70px 11px 18px;gap:22px}
+ .hero{padding-top:8px}.hero p{font-size:10px}.hero-grid{grid-template-columns:1fr 1fr}.hero-grid div:nth-child(2){border-right:0}.hero-grid div:last-child{grid-column:1/-1;border-top:1px solid var(--line)}
+ .swap{padding:13px}.toolbar{align-items:flex-start;flex-direction:column}.wallet-btn{width:100%}
+ .holder-gate{grid-template-columns:34px 1fr}.holder-gate-badge{grid-column:1/-1;text-align:center}
+ .tokenrow{grid-template-columns:1fr 126px}.amount,.out-amount{font-size:28px}
+ .details{grid-template-columns:1fr 1fr}.details div:last-child{grid-column:1/-1}
+ .footerline{font-size:7px}
+}
+
+/* ===== PORTAL V3.5 // UNIFIED UI ===== */
+.chrome{height:76px;padding:0 18px;gap:16px}
+.brand{font-size:10px;letter-spacing:.13em}
+.portal-nav{display:flex;align-items:center;gap:8px;flex:1;justify-content:center;min-width:0;overflow-x:auto;scrollbar-width:none;padding:6px 0}
+.portal-nav::-webkit-scrollbar{display:none}
+.nav-tab{
+  flex:0 0 auto;
+  min-height:42px;
+  border:1px solid #363631;
+  background:#070707;
+  color:#9a9a92;
+  padding:11px 15px;
+  font-size:11px;
+  font-weight:800;
+  line-height:1;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  transition:color .15s,border-color .15s,background .15s,transform .15s;
+}
+.nav-tab:hover{color:#f0efe7;border-color:#6b6b62;transform:translateY(-1px)}
+.nav-tab.active{
+  color:#000;
+  background:var(--acid);
+  border-color:var(--acid);
+  font-weight:900;
+  box-shadow:0 0 18px rgba(195,255,35,.11);
+}
+.nav-tab.next{color:#b5a2a7;border-color:#514247}
+.chrome-right{display:flex;align-items:center;gap:10px}
+.global-wallet{
+  min-height:42px;
+  border:1px solid #454540;
+  background:#0b0b0a;
+  color:#d8d7cf;
+  padding:10px 12px;
+  font-size:9px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.global-wallet.connected{color:var(--acid);border-color:#536c19}
+.portal-page{position:relative;z-index:10}.portal-page:not(.active){display:none!important}
+#routerPage{padding-top:110px}
+.module-page{min-height:100svh;padding:108px 22px 76px;max-width:1220px;margin:0 auto}
+.module-head{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;padding:12px 0 22px;border-bottom:1px solid #2b2b28;margin-bottom:14px}
+.module-kicker{font-size:8px;letter-spacing:.18em;color:#73736c;margin-bottom:8px}.module-head h1{font-family:Arial Black,Impact,sans-serif;font-size:clamp(42px,6.4vw,82px);line-height:.82;letter-spacing:-.065em;margin:0}.module-head h1 em{font-style:normal;color:var(--acid)}
+.module-head p{max-width:580px;color:#999990;font:11px/1.65 Arial,sans-serif;margin:15px 0 0}.module-version{border:1px solid #536c19;color:var(--acid);padding:9px 10px;font-size:8px;letter-spacing:.1em;background:rgba(195,255,35,.035);text-align:right}
+.module-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr);gap:10px}.panel{border:1px solid #30302c;background:rgba(5,5,5,.94);position:relative;overflow:hidden}.panel-title{height:35px;padding:0 11px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #292926;font-size:8px;letter-spacing:.1em;color:#999990}.panel-title b{color:var(--acid);font-size:7px}.panel-body{padding:13px}
+.portal-input,.portal-select{width:100%;border:1px solid #373733;background:#090909;color:#e0dfd8;padding:10px;outline:none;font-size:10px}.portal-input:focus,.portal-select:focus{border-color:#66665e}.field small{display:block;color:#65655f;font-size:7px;letter-spacing:.1em;margin-bottom:5px}.field-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.field-grid.three{grid-template-columns:repeat(3,1fr)}
+.portal-action{border:1px solid var(--acid);background:var(--acid);color:#000;padding:11px 13px;font-size:9px;font-weight:900;letter-spacing:.06em}.portal-action.secondary{background:#090909;color:#d2d1ca;border-color:#41413c}.portal-action:disabled{background:#171715;color:#55554f;border-color:#30302c;cursor:not-allowed}.action-row{display:flex;gap:7px;margin-top:10px}.action-row .portal-action{flex:1}
+.stock-notice{margin:0 0 12px;padding:9px 10px;border-left:2px solid #c99a31;background:#151105;color:#a99768;font-size:7px;line-height:1.55}.source-line{color:#55554f;font-size:7px;margin-top:8px;line-height:1.5}
+.scanner-tools{display:flex;gap:7px;margin-bottom:9px}.scanner-tools input{flex:1}.scanner-list{display:flex;flex-direction:column;gap:5px;min-height:250px}.scanner-row{display:grid;grid-template-columns:minmax(130px,1fr) 110px 90px 70px;align-items:center;gap:8px;border:1px solid #292926;background:#070707;padding:8px 9px;cursor:pointer}.scanner-row:hover,.scanner-row.selected{border-color:#566d1d;background:linear-gradient(90deg,rgba(195,255,35,.05),#070707)}.stock-id{display:flex;align-items:center;gap:8px;min-width:0}.stock-logo{width:28px;height:28px;border:1px solid #343430;background:#0c0c0b;object-fit:cover}.stock-id b{display:block;font-size:9px}.stock-id small{display:block;color:#60605b;font-size:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.scanner-num{text-align:right}.scanner-num b{display:block;font:700 11px Arial,sans-serif}.scanner-num small{display:block;color:#60605b;font-size:7px;margin-top:3px}.score-pill{justify-self:end;min-width:52px;padding:6px;border:1px solid #3e4d20;color:var(--acid);font-size:8px;text-align:center}.score-pill.warn{color:#dfaa4a;border-color:#624c26}.score-pill.bad{color:#ff6680;border-color:#692b3b}
+.registry{margin-top:10px}.registry-list{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;max-height:330px;overflow:auto}.registry-item{border:1px solid #282825;background:#060606;padding:8px;display:flex;align-items:center;gap:7px;min-width:0;cursor:pointer}.registry-item:hover{border-color:#4f4f48}.registry-item img{width:24px;height:24px;object-fit:cover}.registry-item b{display:block;font-size:8px}.registry-item small{display:block;font-size:6px;color:#5d5d57;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.score-big{display:flex;align-items:center;justify-content:space-between;border:1px solid #3c4b1d;background:linear-gradient(90deg,rgba(195,255,35,.065),#070707);padding:12px;margin-bottom:8px}.score-big strong{font:900 35px Arial Black,Arial,sans-serif;color:var(--acid);letter-spacing:-.05em}.score-big span{font-size:7px;color:#72726b}.score-components{display:grid;grid-template-columns:1fr 1fr;gap:5px}.score-component{border:1px solid #292926;padding:8px;background:#070707}.score-component small{display:block;color:#60605b;font-size:6px}.score-component b{font-size:10px}.metric-list{margin-top:8px;border-top:1px solid #292926}.metric{display:flex;justify-content:space-between;gap:10px;padding:8px 1px;border-bottom:1px solid #22221f;font-size:8px;color:#72726c}.metric b{color:#cfcec7;text-align:right}.metric.good b{color:var(--acid)}.metric.bad b{color:#ff6680}
+.shield{margin-top:9px;border:1px solid #34342f;padding:9px;background:#080808}.shield-head{display:flex;justify-content:space-between;font-size:8px}.shield-head b{color:#888881}.shield.pass{border-color:#536c19}.shield.pass .shield-head b{color:var(--acid)}.shield.block{border-color:#6a293b}.shield.block .shield-head b{color:#ff6680}.shield small{display:block;color:#5e5e58;font-size:7px;margin-top:5px;line-height:1.5}
+.rotate-viz{display:grid;grid-template-columns:1fr 54px 1fr;align-items:center;gap:8px;margin:10px 0}.rotate-token{border:1px solid #30302d;background:#070707;padding:12px;text-align:center}.rotate-token img{width:45px;height:45px;border:1px solid #343430;object-fit:cover}.rotate-token b{display:block;margin-top:6px;font:900 16px Arial,sans-serif}.rotate-token small{font-size:7px;color:#66665f}.rotate-arrow{text-align:center;color:var(--acid);font-size:24px}
+.result-box{margin-top:10px;border:1px solid #30302c;background:#060606;padding:11px;min-height:92px}.result-empty{color:#55554f;font-size:8px;line-height:1.7;text-align:center;padding:16px}.result-head{display:flex;justify-content:space-between;gap:10px}.result-head b{font-size:10px}.result-head span{font-size:8px;color:var(--acid)}
+.portfolio-rows{display:flex;flex-direction:column;gap:6px}.portfolio-row{display:grid;grid-template-columns:1fr 95px 34px;gap:6px;align-items:end;border:1px solid #292926;padding:8px;background:#070707}.portfolio-row .remove-row{height:36px;border:1px solid #34342f;background:#0a0a09;color:#777}.weight-total{margin-top:7px;display:flex;justify-content:space-between;font-size:8px;color:#6a6a64}.weight-total b{color:var(--acid)}.plan-list{display:flex;flex-direction:column;gap:6px}.plan-step{display:grid;grid-template-columns:34px 1fr auto;gap:9px;align-items:center;border:1px solid #2e2e2a;background:#070707;padding:9px}.step-no{width:30px;height:30px;border:1px solid #43433e;display:grid;place-items:center;font-size:8px;color:var(--acid)}.plan-step b{display:block;font-size:9px}.plan-step small{display:block;color:#66665f;font-size:7px;margin-top:3px}.plan-step button{border:1px solid #536c19;background:#0a0a08;color:var(--acid);padding:7px;font-size:7px}
+.order-info{padding:9px;border:1px dashed #373732;color:#77776f;font-size:7px;line-height:1.6;margin-bottom:10px}.orders-list{display:flex;flex-direction:column;gap:7px}.order-card{border:1px solid #30302d;background:#070707;padding:10px}.order-card.ready{border-color:#5d7819;background:linear-gradient(90deg,rgba(195,255,35,.07),#070707)}.order-card.error{border-color:#652b39}.order-head{display:flex;justify-content:space-between;gap:10px}.order-head b{font-size:10px}.order-state{font-size:7px;border:1px solid #3c3c37;padding:4px 6px;color:#85857e}.order-card.ready .order-state{color:#000;background:var(--acid);border-color:var(--acid)}.order-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:8px}.order-meta div{border:1px solid #242421;padding:6px}.order-meta small{display:block;color:#55554f;font-size:6px}.order-meta b{font-size:8px}.order-actions{display:flex;gap:5px;margin-top:7px}.order-actions button{flex:1;border:1px solid #343430;background:#0a0a09;color:#999991;padding:6px;font-size:7px}.order-actions .ready-btn{border-color:#536c19;color:var(--acid)}
+.pad-preview{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.pad-card{min-height:150px;border:1px solid #30302d;background:linear-gradient(145deg,rgba(195,255,35,.035),#060606 45%);padding:13px;position:relative}.pad-card span{font-size:24px;color:#55554e}.pad-card b{display:block;margin-top:35px;font-size:10px}.pad-card small{display:block;color:#62625c;font-size:7px;margin-top:5px}.coming-bar{margin-top:10px;border:1px solid #536c19;color:var(--acid);padding:11px;text-align:center;font-size:9px;letter-spacing:.12em;background:rgba(195,255,35,.035)}
+.loading-bar{height:2px;background:#20201e;overflow:hidden;margin-top:8px}.loading-bar i{display:block;height:100%;width:35%;background:var(--acid);animation:scanLoad 1.1s linear infinite}@keyframes scanLoad{from{transform:translateX(-120%)}to{transform:translateX(350%)}}
+/* ================= GLITCH ALPHA V3.7 ================= */
+.alpha-headline{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.live-dot{display:inline-flex;align-items:center;gap:6px;color:var(--acid);font-size:8px;letter-spacing:.1em}.live-dot:before{content:"";width:6px;height:6px;background:var(--acid);box-shadow:0 0 12px var(--acid);animation:blink 1s steps(1) infinite}.alpha-notice{margin-bottom:10px;border:1px solid #30302c;border-left:2px solid var(--acid);background:rgba(195,255,35,.025);padding:9px 10px;color:#77776f;font-size:7px;line-height:1.6}.alpha-metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:10px}.alpha-metric{border:1px solid #292926;background:#060606;padding:9px;min-width:0}.alpha-metric small{display:block;color:#575751;font-size:6px;letter-spacing:.09em;margin-bottom:5px}.alpha-metric b{display:block;font:800 13px Arial,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.alpha-metric b.acid{color:var(--acid)}.alpha-metric b.red{color:#ff6680}
+.alpha-command{display:grid;grid-template-columns:minmax(220px,1fr) auto auto;gap:7px;margin-bottom:8px}.alpha-search{position:relative}.alpha-search input{padding-left:32px}.alpha-search:before{content:">";position:absolute;left:12px;top:10px;color:var(--acid);font-weight:900;z-index:2}.alpha-live-btn.on{border-color:var(--acid);color:var(--acid)}
+.alpha-tabs{display:flex;gap:5px;overflow:auto;padding-bottom:6px;margin-bottom:6px}.alpha-tab{border:1px solid #30302c;background:#070707;color:#797972;padding:7px 9px;font-size:7px;white-space:nowrap}.alpha-tab.active{border-color:var(--acid);color:#000;background:var(--acid);font-weight:900}.alpha-filterbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px}.alpha-filterbar label small{display:block;color:#55554f;font-size:6px;margin-bottom:4px}.alpha-workspace{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(360px,.75fr);gap:10px;align-items:start}.alpha-feed-panel{min-width:0}.alpha-detail-panel{position:sticky;top:108px;max-height:calc(100vh - 130px);overflow:auto}.alpha-table{width:100%;border-collapse:collapse;table-layout:fixed}.alpha-table th{color:#5d5d57;font-size:6px;font-weight:400;text-align:right;padding:6px;border-bottom:1px solid #292926;letter-spacing:.08em}.alpha-table th:first-child{text-align:left;width:30%}.alpha-table td{padding:8px 6px;border-bottom:1px solid #1f1f1d;font-size:8px;text-align:right;vertical-align:middle}.alpha-row{cursor:pointer;background:#050505}.alpha-row:hover,.alpha-row.selected{background:linear-gradient(90deg,rgba(195,255,35,.055),#050505);outline:1px solid #3f5018}.alpha-token{display:flex;align-items:center;gap:7px;text-align:left;min-width:0}.alpha-avatar{width:30px;height:30px;flex:0 0 30px;border:1px solid #343430;background:#0b0b0a;object-fit:cover;display:grid;place-items:center;color:var(--acid);font-size:8px;font-weight:900}.alpha-token b{display:block;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.alpha-token small{display:block;color:#565650;font-size:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}.alpha-num b{display:block;font:700 9px Arial,sans-serif}.alpha-num small{display:block;color:#50504b;font-size:6px;margin-top:3px}.alpha-change.up{color:var(--acid)}.alpha-change.down{color:#ff6680}.alpha-score{display:inline-flex;min-width:38px;justify-content:center;border:1px solid #536c19;color:var(--acid);padding:5px 4px;font-size:7px}.alpha-score.mid{border-color:#75602c;color:#d7aa4d}.alpha-score.low{border-color:#61303c;color:#ff6680}.alpha-risk{font-size:6px}.alpha-risk.high{color:#ff6680}.alpha-risk.medium{color:#d7aa4d}.alpha-empty{padding:44px 12px;text-align:center;color:#55554f;font-size:8px;line-height:1.7}
+.alpha-detail{padding:12px}.alpha-token-head{display:grid;grid-template-columns:42px 1fr auto;gap:9px;align-items:center;padding-bottom:10px;border-bottom:1px solid #292926}.alpha-token-head .alpha-avatar{width:42px;height:42px}.alpha-token-head h3{margin:0;font:900 17px Arial,sans-serif}.alpha-token-head small{display:block;color:#5c5c56;font-size:6px;margin-top:4px;word-break:break-all}.alpha-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}.alpha-badge{border:1px solid #343430;padding:4px 5px;font-size:6px;color:#8a8a82}.alpha-badge.good{border-color:#536c19;color:var(--acid)}.alpha-badge.warn{border-color:#715828;color:#d7aa4d}.alpha-badge.bad{border-color:#6b2d3c;color:#ff6680}.alpha-price{font:900 16px Arial,sans-serif;text-align:right}.alpha-price small{font:400 6px "Courier New";color:#5d5d57}.alpha-statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:9px}.alpha-stat{border:1px solid #252522;background:#070707;padding:7px;min-width:0}.alpha-stat small{display:block;color:#55554f;font-size:6px}.alpha-stat b{display:block;font:700 9px Arial,sans-serif;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.alpha-timeframes{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:7px}.alpha-tf{border:1px solid #252522;text-align:center;padding:6px 2px}.alpha-tf small{display:block;color:#55554f;font-size:6px}.alpha-tf b{font-size:8px}.alpha-chart{height:120px;border:1px solid #292926;background:#030303;margin-top:8px;position:relative;overflow:hidden}.alpha-chart svg{width:100%;height:100%;display:block}.alpha-chart-label{position:absolute;left:7px;top:6px;color:#55554f;font-size:6px;z-index:2}.alpha-section{margin-top:10px;border-top:1px solid #292926;padding-top:9px}.alpha-section-title{display:flex;justify-content:space-between;align-items:center;font-size:7px;letter-spacing:.1em;color:#77776f;margin-bottom:7px}.alpha-section-title b{color:var(--acid);font-size:7px}.alpha-scoreboard{display:grid;grid-template-columns:82px 1fr;gap:8px}.alpha-score-ring{border:1px solid #536c19;display:grid;place-items:center;min-height:78px;background:rgba(195,255,35,.025)}.alpha-score-ring strong{font:900 30px Arial Black,Arial;color:var(--acid)}.alpha-score-ring small{display:block;font-size:5px;color:#6d6d66;text-align:center}.alpha-bars{display:flex;flex-direction:column;gap:5px}.alpha-bar{display:grid;grid-template-columns:64px 1fr 26px;gap:5px;align-items:center;font-size:6px;color:#66665f}.alpha-bar-track{height:4px;background:#1d1d1b;overflow:hidden}.alpha-bar-track i{height:100%;display:block;background:var(--acid)}.alpha-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.alpha-flow>div{border:1px solid #252522;padding:7px}.alpha-flow small{display:block;color:#55554f;font-size:6px}.alpha-flow b{display:block;font-size:8px;margin-top:3px}.security-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}.security-signal{display:flex;justify-content:space-between;gap:7px;border:1px solid #252522;padding:6px;font-size:6px;color:#696962}.security-signal b{color:#c9c8c1}.security-signal b.bad{color:#ff6680}.security-signal b.good{color:var(--acid)}.risk-box{margin-top:6px;border:1px solid #353530;padding:8px}.risk-box.high{border-color:#6b2d3c;background:rgba(255,44,84,.035)}.risk-box.medium{border-color:#715828}.risk-head{display:flex;justify-content:space-between;font-size:7px}.risk-flags{margin-top:6px;color:#77776f;font-size:6px;line-height:1.7}.holder-list,.trade-list{display:flex;flex-direction:column;gap:3px;max-height:165px;overflow:auto}.holder-row,.trade-row{display:grid;grid-template-columns:28px 1fr auto;gap:6px;align-items:center;border-bottom:1px solid #20201e;padding:5px 1px;font-size:6px}.holder-row span:first-child{color:#55554f}.holder-row b,.trade-row b{font-size:7px}.trade-row{grid-template-columns:42px 1fr auto}.trade-kind.buy{color:var(--acid)}.trade-kind.sell{color:#ff6680}.alpha-actions{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:9px}.alpha-actions button,.alpha-actions a{border:1px solid #41413c;background:#090909;color:#c8c7c0;padding:8px;text-align:center;text-decoration:none;font-size:7px}.alpha-actions .primary{border-color:var(--acid);background:var(--acid);color:#000;font-weight:900}.watch-on{border-color:var(--acid)!important;color:var(--acid)!important}.alpha-bottom{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.alpha-pulse-list{max-height:210px;overflow:auto}.pulse-row{display:grid;grid-template-columns:62px 1fr auto;gap:8px;border-bottom:1px solid #22221f;padding:7px 2px;align-items:center;font-size:7px}.pulse-row time{color:#55554f}.pulse-row b{font-size:8px}.pulse-row small{display:block;color:#595953;font-size:6px;margin-top:2px}.pulse-tag{font-size:6px;border:1px solid #536c19;color:var(--acid);padding:4px}.alpha-source-status{display:flex;gap:4px;flex-wrap:wrap}.alpha-source-status span{border:1px solid #292926;padding:3px 5px;font-size:5px;color:#64645e}.alpha-source-status span.on{color:var(--acid);border-color:#3d4f16}.alpha-source-status span.off{color:#ff6680;border-color:#5d2936}
+@media(max-width:1050px){.alpha-workspace{grid-template-columns:1fr}.alpha-detail-panel{position:relative;top:auto;max-height:none}.alpha-metrics{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.alpha-command{grid-template-columns:1fr auto}.alpha-command .alpha-live-btn{display:none}.alpha-filterbar{grid-template-columns:1fr 1fr}.alpha-table th:nth-child(4),.alpha-table td:nth-child(4){display:none}.alpha-metrics{grid-template-columns:repeat(2,1fr)}.alpha-bottom{grid-template-columns:1fr}.alpha-statgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.alpha-table th:first-child{width:42%}.alpha-table th:nth-child(3),.alpha-table td:nth-child(3){display:none}.alpha-filterbar{grid-template-columns:1fr}.alpha-scoreboard{grid-template-columns:70px 1fr}.security-grid{grid-template-columns:1fr}}
+
+@media(max-width:1050px){.brand span.brand-long{display:none}.net{display:none}.module-grid{grid-template-columns:1fr}.registry-list{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){
+ .chrome{height:118px;align-items:flex-start;padding:10px 10px 0;flex-wrap:wrap;gap:6px}
+ .brand{height:30px;font-size:9px}
+ .chrome-right{margin-left:auto;height:30px}
+ .global-wallet{min-height:30px;padding:7px 9px;font-size:8px}
+ .portal-nav{order:3;width:100%;justify-content:flex-start;gap:7px;padding:7px 0 10px}
+ .nav-tab{min-height:38px;padding:10px 13px;font-size:10px}
+ .module-page{padding:140px 10px 65px}
+ #routerPage{padding-top:148px}
+ .module-head{grid-template-columns:1fr}
+ .module-version{text-align:left;width:max-content}
+ .field-grid,.field-grid.three{grid-template-columns:1fr 1fr}
+ .scanner-row{grid-template-columns:1fr 88px 60px}
+ .scanner-row .scanner-num:nth-child(3){display:none}
+ .pad-preview{grid-template-columns:1fr 1fr}
+ .order-meta{grid-template-columns:1fr 1fr}
+}
+@media(max-width:500px){.field-grid,.field-grid.three{grid-template-columns:1fr}.registry-list{grid-template-columns:1fr}.scanner-row{grid-template-columns:1fr 82px}.scanner-row .scanner-num:nth-child(3){display:none}.score-components{grid-template-columns:1fr 1fr}.rotate-viz{grid-template-columns:1fr 36px 1fr}.pad-preview{grid-template-columns:1fr}.portfolio-row{grid-template-columns:1fr 80px 34px}}
+
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="voidCanvas"></canvas><div class="vignette"></div><div class="scanlines"></div><div class="noise"></div>
+</div>
+<div class="glitchline"></div>
+
+<header class="chrome">
+  <div class="brand"><span class="sig"></span><span class="brand-long">DEAD PIXELS LABS // </span>PORTAL V3.7</div>
+  <nav class="portal-nav" aria-label="Portal modules">
+    <button class="nav-tab active" data-page="routerPage">01 ROUTER</button>
+    <button class="nav-tab" data-page="alphaPage">02 ALPHA <span style="color:#c3ff23">●</span></button>
+    <button class="nav-tab" data-page="stocksPage">03 STOCK ENGINE</button>
+    <button class="nav-tab" data-page="rotatePage">04 ROTATE</button>
+    <button class="nav-tab" data-page="portfolioPage">05 PORTFOLIO</button>
+    <button class="nav-tab" data-page="ordersPage">06 ORDERS</button>
+    <button class="nav-tab next" data-page="padPage">07 GLITCH PAD</button>
+  </nav>
+  <div class="chrome-right">
+    <div class="net"><i></i><span>4663</span></div>
+    <button id="portalWalletBtn" class="global-wallet">CONNECT</button>
+  </div>
+</header>
+
+<main id="routerPage" class="page portal-page active">
+  <section class="hero">
+    <div class="kicker">PORTAL MODULE 01 // EXECUTION LAYER</div>
+    <h1>GLITCH<br><em>ROUTER</em></h1>
+    <p>One interface. Multiple execution paths. One goal: better net execution. GLITCH ROUTER scans available routes and selects the result designed to leave more in your wallet.</p>
+    <div class="hero-grid">
+      <div><small>PROTOCOL FEE</small><b class="protocol-zero">0.00%</b></div>
+      <div><small>CUSTODY</small><b>NON-CUSTODIAL</b></div>
+      <div><small>NETWORK</small><b>ROBINHOOD CHAIN</b></div>
+    </div>
+  </section>
+
+  <section class="swap-shell">
+    <div class="windowbar">
+      <span>GLITCH_SWAP.EXE // V3.5.2 CORE</span>
+      <span class="dots"><i></i><i></i><i></i></span>
+    </div>
+    <div class="swap">
+      <div class="toolbar">
+        <div class="pair-buttons">
+          <button class="mini active" data-pair="GLITCH,ETH">$GLITCH / ETH</button>
+          <button class="mini" data-pair="ETH,USDG">ETH / USDG</button>
+          <button class="mini" data-pair="WETH,USDG">WETH / USDG</button>
+        </div>
+        <button id="walletBtn" class="wallet-btn">CONNECT WALLET</button>
+      </div>
+
+      <div id="holderGate" class="holder-gate">
+        <div class="holder-gate-icon">👾</div>
+        <div class="holder-gate-copy">
+          <small>DEAD PIXELS ACCESS CONTROL</small>
+          <b id="holderGateTitle">CONNECT WALLET TO UNLOCK SWAPS</b>
+          <span id="holderGateDetail">1+ DEAD PIXEL REQUIRED // ONCHAIN CHECK</span>
+        </div>
+        <div id="holderGateBadge" class="holder-gate-badge">LOCKED</div>
+      </div>
+
+      <div class="tokenbox">
+        <div class="tokenbox-head"><span>YOU PAY</span><button id="maxBtn" class="balance-btn">BALANCE: --</button></div>
+        <div class="token-search-row"><input id="sellTokenSearch" class="token-search" autocomplete="off" placeholder="SEARCH TOKEN / SYMBOL / CONTRACT"></div>
+        <div class="tokenrow">
+          <input id="sellAmount" class="amount" inputmode="decimal" autocomplete="off" placeholder="0.0">
+          <select id="sellToken" class="token-select"></select>
+        </div>
+        <div id="sellCustomWrap" class="custom-wrap">
+          <input id="sellCustom" class="custom-address" placeholder="0x token contract address">
+          <div id="sellCustomMeta" class="custom-meta"></div>
+        </div>
+      </div>
+
+      <div class="reverse-wrap"><button id="reverseBtn" class="reverse" title="Reverse pair">⇅</button></div>
+
+      <div class="tokenbox">
+        <div class="tokenbox-head"><span>YOU RECEIVE</span><span id="receiveHint">BEST AVAILABLE QUOTE</span></div>
+        <div class="token-search-row"><input id="buyTokenSearch" class="token-search" autocomplete="off" placeholder="SEARCH TOKEN / SYMBOL / CONTRACT"></div>
+        <div class="tokenrow">
+          <div id="buyAmount" class="out-amount">0.0</div>
+          <select id="buyToken" class="token-select"></select>
+        </div>
+        <div id="buyCustomWrap" class="custom-wrap">
+          <input id="buyCustom" class="custom-address" placeholder="0x token contract address">
+          <div id="buyCustomMeta" class="custom-meta"></div>
+        </div>
+      </div>
+
+      <div class="slippage">
+        <span>MAX SLIPPAGE</span>
+        <select id="slippage">
+          <option value="10">0.10%</option>
+          <option value="50" selected>0.50%</option>
+          <option value="100">1.00%</option>
+          <option value="200">2.00%</option>
+        </select>
+      </div>
+
+      <div id="rwaNotice" class="rwa">STOCK TOKEN NOTICE // Availability, transfer and trading restrictions may depend on jurisdiction and issuer rules. This interface does not determine your legal eligibility.</div>
+
+      <div id="baselinePanel" class="baseline-panel">
+        <span>UNISWAP BASELINE</span>
+        <b id="baselineText">WAITING FOR QUOTE</b>
+      </div>
+
+      <div id="quotePanel" class="quote-panel"><div class="empty">CONNECT WALLET + ENTER AN AMOUNT<br>TO SCAN AVAILABLE ROUTES.</div></div>
+
+      <button id="actionBtn" class="action" disabled>CONNECT WALLET</button>
+      <div id="statusLog" class="statuslog">SYSTEM READY // NO TRANSACTION CREATED</div>
+
+      <div class="details">
+        <div><small>PROTOCOL FEE</small><b>0.00%</b></div>
+        <div><small>ROUTING</small><b id="routingLabel">UNISWAP BASELINE ENGINE</b></div>
+        <div><small>EXECUTION</small><b>YOUR WALLET</b></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+
+<main id="alphaPage" class="portal-page module-page">
+  <div class="module-head">
+    <div><div class="module-kicker">V3.7 // UNIVERSAL REAL-TIME TOKEN INTELLIGENCE</div><h1>GLITCH <em>ALPHA</em></h1><p>Scan the entire Robinhood Chain market surface — memes, Stock Tokens, stablecoins and fresh launches. Multi-source intelligence combines direct onchain signals, DEX market data, holders, deployer activity and contract-risk indicators.</p></div>
+    <div class="module-version"><span class="live-dot">LIVE</span><br>ZERO PROTOCOL FEE</div>
+  </div>
+  <div class="alpha-notice">ALPHA IS AN INTELLIGENCE LAYER, NOT A SAFETY GUARANTEE OR INVESTMENT RECOMMENDATION. CONTRACT, HOLDER AND MARKET SIGNALS CAN CHANGE AT ANY BLOCK. EXECUTION REMAINS NON-CUSTODIAL AND WALLET-CONFIRMED.</div>
+  <div class="alpha-metrics">
+    <div class="alpha-metric"><small>NETWORK</small><b class="acid">ROBINHOOD // 4663</b></div>
+    <div class="alpha-metric"><small>LIVE BLOCK</small><b id="alphaBlock">--</b></div>
+    <div class="alpha-metric"><small>MARKETS SEEN</small><b id="alphaMarketCount">--</b></div>
+    <div class="alpha-metric"><small>JUST BORN</small><b id="alphaNewCount">--</b></div>
+    <div class="alpha-metric"><small>ALPHA ≥ 88</small><b id="alphaHotCount" class="acid">--</b></div>
+    <div class="alpha-metric"><small>LIVE MODE</small><b id="alphaLiveState" class="acid">ON</b></div>
+  </div>
+  <section class="panel alpha-feed-panel">
+    <div class="panel-title"><span>GLITCH_ALPHA_RADAR.EXE</span><div id="alphaSources" class="alpha-source-status"><span>CONNECTING...</span></div></div>
+    <div class="panel-body">
+      <div class="alpha-command">
+        <div class="alpha-search"><input id="alphaSearch" class="portal-input" autocomplete="off" placeholder="SEARCH ANY TOKEN // SYMBOL // NAME // 0x CONTRACT"></div>
+        <button id="alphaSearchBtn" class="portal-action">SCAN</button>
+        <button id="alphaLiveBtn" class="portal-action secondary alpha-live-btn on">● LIVE</button>
+      </div>
+      <div class="alpha-tabs">
+        <button class="alpha-tab active" data-alpha-view="trending">🔥 TRENDING</button>
+        <button class="alpha-tab" data-alpha-view="newest">⚡ JUST BORN</button>
+        <button class="alpha-tab" data-alpha-view="gainers">↗ GAINERS</button>
+        <button class="alpha-tab" data-alpha-view="volume">▥ VOLUME</button>
+        <button class="alpha-tab" data-alpha-view="risk">⚠ RISK RADAR</button>
+        <button class="alpha-tab" data-alpha-view="all">▦ ALL TOKENS</button>
+        <button class="alpha-tab" data-alpha-view="watchlist">◉ WATCHLIST</button>
+      </div>
+      <div class="alpha-filterbar">
+        <label><small>MIN LIQUIDITY // USD</small><input id="alphaMinLiq" class="portal-input" value="0" inputmode="numeric"></label>
+        <label><small>MAX MARKET AGE</small><select id="alphaMaxAge" class="portal-select"><option value="0">ANY AGE</option><option value="600">10 MIN</option><option value="3600">1 HOUR</option><option value="21600">6 HOURS</option><option value="86400">24 HOURS</option><option value="604800">7 DAYS</option></select></label>
+        <label><small>SORT</small><select id="alphaSort" class="portal-select"><option value="score">GLITCH SCORE</option><option value="new">NEWEST</option><option value="gainers">24H GAIN</option><option value="volume">24H VOLUME</option><option value="liquidity">LIQUIDITY</option></select></label>
+      </div>
+      <div class="alpha-workspace">
+        <section class="panel alpha-feed-panel">
+          <div class="panel-title"><span id="alphaFeedTitle">TRENDING_MARKETS.LOG</span><b id="alphaFeedCount">0 RESULTS</b></div>
+          <div class="panel-body" style="padding:0;overflow:auto">
+            <table class="alpha-table"><thead><tr><th>TOKEN / MARKET</th><th>PRICE / 24H</th><th>LIQUIDITY</th><th>VOL 24H</th><th>GLITCH</th></tr></thead><tbody id="alphaFeed"><tr><td colspan="5"><div class="alpha-empty"><div class="loading-bar"><i></i></div><br>INITIALIZING MULTI-SOURCE RADAR...</div></td></tr></tbody></table>
+          </div>
+        </section>
+        <aside class="panel alpha-detail-panel">
+          <div class="panel-title"><span>TOKEN_INTELLIGENCE.EXE</span><b id="alphaDetailState">SELECT TOKEN</b></div>
+          <div id="alphaDetail" class="alpha-detail"><div class="alpha-empty">SELECT ANY TOKEN TO OPEN FULL INTELLIGENCE.<br><br>MARKET // FLOW // HOLDERS // SECURITY // DEPLOYER // WHALES // SOURCE CONSENSUS</div></div>
+        </aside>
+      </div>
+    </div>
+  </section>
+  <div class="alpha-bottom">
+    <section class="panel"><div class="panel-title"><span>ONCHAIN_PULSE.LOG</span><b id="alphaPulseState">SCANNING</b></div><div class="panel-body"><div id="alphaPulse" class="alpha-pulse-list"><div class="result-empty">READING FRESH ZERO-ADDRESS MINT SIGNALS...</div></div></div></section>
+    <section class="panel"><div class="panel-title"><span>ALPHA_WATCHLIST.DB</span><b id="alphaWatchCount">0 TOKENS</b></div><div class="panel-body"><div id="alphaWatchlist"><div class="result-empty">NO TOKENS WATCHED YET.</div></div><div class="source-line">WATCHLIST IS STORED LOCALLY IN THIS BROWSER. IT NEVER REQUESTS A PRIVATE KEY OR SEED PHRASE.</div></div></section>
+  </div>
+</main>
+
+<main id="stocksPage" class="portal-page module-page">
+  <div class="module-head">
+    <div><div class="module-kicker">V3.1 + V3.2 // STOCK TOKEN REGISTRY + FAIR VALUE ENGINE</div><h1>STOCK <em>ENGINE</em></h1><p>Discover Robinhood Stock Tokens, scan official market references, compare executable routes and measure execution quality before you trade.</p></div>
+    <div class="module-version">LIVE DATA // 15S MARKET CACHE<br>GLITCH SCORE // 0–100</div>
+  </div>
+  <div class="stock-notice">STOCK TOKEN NOTICE // Access, transfer and trading restrictions may apply by jurisdiction and issuer rules. This interface does not determine your legal eligibility. Market reference data is informational, not investment advice.</div>
+  <div class="module-grid">
+    <section class="panel">
+      <div class="panel-title"><span>GLITCH_MARKET_SCANNER.EXE</span><b id="scannerStatus">LOADING REGISTRY...</b></div>
+      <div class="panel-body">
+        <div class="scanner-tools"><input id="scannerSearch" class="portal-input" placeholder="SEARCH STOCK TOKEN // SYMBOL"><button id="refreshScanner" class="portal-action secondary">REFRESH</button></div>
+        <div id="scannerList" class="scanner-list"><div class="result-empty">CONNECTING TO ROBINHOOD STOCK TOKEN REGISTRY...</div></div>
+        <div class="source-line">FAIR REFERENCE // official RHJ bid/ask adjusted by current Stock Token multiplier. Execution quality is calculated separately against live executable routing.</div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panel-title"><span>FAIR_VALUE_SHIELD.EXE</span><b id="stockDetailState">SELECT ASSET</b></div>
+      <div class="panel-body">
+        <div class="field-grid">
+          <label class="field"><small>ASSET</small><select id="stockAnalyzeSymbol" class="portal-select"></select></label>
+          <label class="field"><small>TEST NOTIONAL // USDG</small><input id="stockAnalyzeAmount" class="portal-input" value="100" inputmode="decimal"></label>
+        </div>
+        <label class="field" style="display:block;margin-top:8px"><small>MAX EXECUTION DEVIATION // %</small><input id="stockShieldMax" class="portal-input" value="0.25" inputmode="decimal"></label>
+        <div id="stockScoreBox" class="result-box"><div class="result-empty">SELECT A STOCK TOKEN AND ANALYZE EXECUTION.</div></div>
+        <div class="action-row"><button id="analyzeStockBtn" class="portal-action secondary">ANALYZE EXECUTION</button><button id="tradeStockBtn" class="portal-action" disabled>LOAD INTO ROUTER</button></div>
+      </div>
+    </section>
+  </div>
+  <section class="panel registry">
+    <div class="panel-title"><span>STOCK_TOKEN_REGISTRY.DB</span><b id="registryCount">0 ASSETS</b></div>
+    <div class="panel-body"><input id="registrySearch" class="portal-input" placeholder="FILTER ALL STOCK TOKENS // NAME // SYMBOL // CONTRACT"><div id="registryList" class="registry-list" style="margin-top:7px"></div></div>
+  </section>
+</main>
+
+<main id="rotatePage" class="portal-page module-page">
+  <div class="module-head"><div><div class="module-kicker">V3.3 // STOCK-TO-STOCK EXECUTION</div><h1>STOCK <em>ROTATOR</em></h1><p>Move directly from one Stock Token exposure to another. GLITCH estimates fair cross-value, scans execution and blocks routes that exceed your Fair Value Shield.</p></div><div class="module-version">STOCK → STOCK<br>NO MANUAL STABLECOIN HOP</div></div>
+  <div class="module-grid">
+    <section class="panel"><div class="panel-title"><span>ROTATE_POSITION.EXE</span><b>HOLDER EXECUTION</b></div><div class="panel-body">
+      <div class="field-grid three"><label class="field"><small>SELL STOCK</small><select id="rotateSell" class="portal-select"></select></label><label class="field"><small>AMOUNT</small><input id="rotateAmount" class="portal-input" value="1" inputmode="decimal"></label><label class="field"><small>BUY STOCK</small><select id="rotateBuy" class="portal-select"></select></label></div>
+      <div class="rotate-viz"><div id="rotateSellViz" class="rotate-token"><span>SELL</span></div><div class="rotate-arrow">→</div><div id="rotateBuyViz" class="rotate-token"><span>BUY</span></div></div>
+      <label class="field"><small>FAIR VALUE SHIELD // MAX SHORTFALL %</small><input id="rotateShield" class="portal-input" value="0.30" inputmode="decimal"></label>
+      <div id="rotateResult" class="result-box"><div class="result-empty">CHOOSE TWO STOCK TOKENS TO ANALYZE THE ROTATION.</div></div>
+      <div class="action-row"><button id="rotateAnalyzeBtn" class="portal-action secondary">ANALYZE ROTATION</button><button id="rotateTradeBtn" class="portal-action" disabled>LOAD ROTATION INTO ROUTER</button></div>
+    </div></section>
+    <aside class="panel"><div class="panel-title"><span>CROSS_VALUE.LOG</span><b>FAIR REFERENCE</b></div><div class="panel-body"><div id="rotateMetrics" class="metric-list"><div class="result-empty">NO ANALYSIS YET.</div></div></div></aside>
+  </div>
+</main>
+
+<main id="portfolioPage" class="portal-page module-page">
+  <div class="module-head"><div><div class="module-kicker">V3.4 // PORTFOLIO BUILDER + REBALANCER</div><h1>PORTFOLIO <em>ENGINE</em></h1><p>Build a Stock Token allocation from USDG or scan selected wallet positions and generate a non-custodial rebalance queue. Every step returns to GLITCH ROUTER for wallet-confirmed execution.</p></div><div class="module-version">NO CUSTODY<br>SEQUENTIAL WALLET EXECUTION</div></div>
+  <div class="module-grid">
+    <section class="panel"><div class="panel-title"><span>PORTFOLIO_BUILDER.EXE</span><b id="weightTotal">TARGET // 100%</b></div><div class="panel-body">
+      <div class="field-grid"><label class="field"><small>NEW PORTFOLIO CAPITAL // USDG</small><input id="portfolioCapital" class="portal-input" value="1000" inputmode="decimal"></label><div class="field"><small>MODE</small><div class="action-row" style="margin:0"><button id="buildPlanBtn" class="portal-action secondary">BUILD NEW</button><button id="rebalanceBtn" class="portal-action secondary">REBALANCE WALLET</button></div></div></div>
+      <div id="portfolioRows" class="portfolio-rows" style="margin-top:10px"></div>
+      <button id="addPortfolioRow" class="portal-action secondary" style="width:100%;margin-top:7px">+ ADD ASSET</button>
+      <div class="weight-total"><span>WEIGHTS MUST TOTAL 100%</span><b id="weightSum">100.00%</b></div>
+      <div id="portfolioStatus" class="source-line">READY // BUILD NEW uses USDG. REBALANCE scans selected Stock Token balances and matches overweight → underweight positions directly where possible.</div>
+    </div></section>
+    <section class="panel"><div class="panel-title"><span>EXECUTION_QUEUE.LOG</span><b id="planCount">0 STEPS</b></div><div class="panel-body"><div id="portfolioPlan" class="plan-list"><div class="result-empty">NO PORTFOLIO PLAN GENERATED.</div></div></div></section>
+  </div>
+</main>
+
+<main id="ordersPage" class="portal-page module-page">
+  <div class="module-head"><div><div class="module-kicker">V3.5 // WAIT FOR BETTER + EXECUTION ORDERS</div><h1>GLITCH <em>ORDERS</em></h1><p>Arm execution-quality conditions instead of blindly taking the current route. The watcher checks fair value, route deviation, gas and GLITCH SCORE, then alerts you when the conditions are met.</p></div><div class="module-version">NON-CUSTODIAL WATCH<br>WALLET CONFIRMATION REQUIRED</div></div>
+  <div class="module-grid">
+    <section class="panel"><div class="panel-title"><span>WAIT_FOR_BETTER.EXE</span><b>CLIENT WATCH ENGINE</b></div><div class="panel-body">
+      <div class="order-info">WATCH ORDERS ARE STORED LOCALLY IN THIS BROWSER AND CHECKED WHILE THE PORTAL IS OPEN. THEY DO NOT CUSTODY FUNDS AND CANNOT SIGN OR EXECUTE A TRANSACTION WITHOUT YOUR WALLET CONFIRMATION.</div>
+      <div class="field-grid three"><label class="field"><small>SIDE</small><select id="orderSide" class="portal-select"><option value="buy">BUY</option><option value="sell">SELL</option></select></label><label class="field"><small>STOCK TOKEN</small><select id="orderStock" class="portal-select"></select></label><label class="field"><small id="orderAmountLabel">AMOUNT // USDG</small><input id="orderAmount" class="portal-input" value="100" inputmode="decimal"></label></div>
+      <div class="field-grid" style="margin-top:8px"><label class="field"><small>TARGET FAIR PRICE // OPTIONAL</small><input id="orderTargetPrice" class="portal-input" placeholder="BUY ≤ / SELL ≥" inputmode="decimal"></label><label class="field"><small>MAX EXECUTION DEVIATION // %</small><input id="orderMaxDeviation" class="portal-input" value="0.25" inputmode="decimal"></label></div>
+      <div class="field-grid" style="margin-top:8px"><label class="field"><small>MIN GLITCH SCORE</small><input id="orderMinScore" class="portal-input" value="90" inputmode="numeric"></label><label class="field"><small>MAX USER GAS // USD</small><input id="orderMaxGas" class="portal-input" value="0.25" inputmode="decimal"></label></div>
+      <button id="armOrderBtn" class="portal-action" style="width:100%;margin-top:10px">ARM EXECUTION ORDER</button>
+      <div id="orderStatus" class="source-line">WATCH ENGINE READY.</div>
+    </div></section>
+    <section class="panel"><div class="panel-title"><span>ARMED_ORDERS.DB</span><b id="ordersCount">0 ACTIVE</b></div><div class="panel-body"><div id="ordersList" class="orders-list"><div class="result-empty">NO EXECUTION ORDERS ARMED.</div></div></div></section>
+  </div>
+</main>
+
+<main id="padPage" class="portal-page module-page">
+  <div class="module-head"><div><div class="module-kicker">PORTAL MODULE 06 // LAUNCH INFRASTRUCTURE</div><h1>GLITCH <em>PAD</em></h1><p>The launch infrastructure module remains in development while the Stock Engine ships as part of the unified Portal update.</p></div><div class="module-version">COMING SOON</div></div>
+  <div class="pad-preview"><div class="pad-card"><span>◈</span><b>CREATE TOKEN</b><small>ERC-20 DEPLOYMENT FLOW</small></div><div class="pad-card"><span>◇</span><b>CREATE PRESALE</b><small>FIXED PRICE SALE ENGINE</small></div><div class="pad-card"><span>⌁</span><b>LIQUIDITY</b><small>POST-SALE LIQUIDITY FLOW</small></div><div class="pad-card"><span>▣</span><b>LP LOCKER</b><small>LOCK POSITION INFRASTRUCTURE</small></div></div>
+  <div class="coming-bar">GLITCH PAD // COMING SOON // PREVIEW ONLY</div>
+</main>
+
+<div class="footerline"><span>ERROR MAKES US UNIQUE.</span><span>PORTAL V3.7 // GLITCH ALPHA + UNIFIED EXECUTION OS</span></div>
+
+<script>
+(() => {
+  "use strict";
+
+  const CHAIN_ID = 4663;
+  const CHAIN_HEX = "0x1237";
+  const NATIVE = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+  const EXPLORER = "https://robinhoodchain.blockscout.com";
+  const TOKENS = {
+    ETH:{symbol:"ETH",name:"Ether",address:NATIVE,decimals:18,native:true},
+    WETH:{symbol:"WETH",name:"Wrapped Ether",address:"0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",decimals:18},
+    USDG:{symbol:"USDG",name:"Global Dollar",address:"0x5fc5360d0400a0fd4f2af552add042d716f1d168",decimals:6},
+    GLITCH:{symbol:"GLITCH",name:"GLITCH",address:"0xaeca11ad61d76f7c2d6b1100d3ca9066fbdb8459",decimals:null},
+    NVDA:{symbol:"NVDA",name:"NVIDIA • Robinhood Token",address:"0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec",decimals:18,rwa:true},
+    CUSTOM:{symbol:"CUSTOM",name:"Custom token",address:"",decimals:null}
+  };
+
+  const $ = id => document.getElementById(id);
+  const els = {
+    walletBtn:$("walletBtn"), portalWalletBtn:$("portalWalletBtn"), holderGate:$("holderGate"), holderGateTitle:$("holderGateTitle"), holderGateDetail:$("holderGateDetail"), holderGateBadge:$("holderGateBadge"), sellAmount:$("sellAmount"), sellToken:$("sellToken"), buyToken:$("buyToken"),
+    buyAmount:$("buyAmount"), slippage:$("slippage"), quotePanel:$("quotePanel"), actionBtn:$("actionBtn"),
+    status:$("statusLog"), maxBtn:$("maxBtn"), reverseBtn:$("reverseBtn"), rwa:$("rwaNotice"),
+    sellCustomWrap:$("sellCustomWrap"), buyCustomWrap:$("buyCustomWrap"),
+    sellCustom:$("sellCustom"), buyCustom:$("buyCustom"), sellCustomMeta:$("sellCustomMeta"), buyCustomMeta:$("buyCustomMeta"),
+    sellTokenSearch:$("sellTokenSearch"), buyTokenSearch:$("buyTokenSearch"),
+    routingLabel:$("routingLabel"), baselinePanel:$("baselinePanel"), baselineText:$("baselineText")
+  };
+
+  let account = null, quotes = [], selectedQuote = null, quoteTimer = null;
+  let holderState = {checked:false,eligible:false,balance:0};
+  let customSell = null, customBuy = null, quoteAbort = null;
+  let tokenCatalog = [];
+  let stockRegistry = [], stockScanItems = [], selectedStockAnalysis = null, rotateAnalysis = null;
+  let portfolioRowsState = [], portfolioPlanState = [];
+  let executionOrders = [];
+  const ORDER_STORE = "dead_pixels_glitch_orders_v35";
+
+  function addrOk(v){ return /^0x[a-fA-F0-9]{40}$/.test(v || ""); }
+  function short(v){ return v ? v.slice(0,6)+"…"+v.slice(-4) : "--"; }
+  function setStatus(msg,type=""){ els.status.textContent=msg; els.status.className="statuslog"+(type?" "+type:""); }
+  function escapeHtml(s){ return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])); }
+
+  function parseUnits(value, decimals){
+    value=String(value||"").trim();
+    if(!/^\d*(\.\d*)?$/.test(value)||value===""||value===".") throw new Error("INVALID AMOUNT");
+    let [a,b=""]=value.split(".");
+    a=a||"0"; b=b.slice(0,decimals).padEnd(decimals,"0");
+    return (BigInt(a)*10n**BigInt(decimals)+BigInt(b||"0")).toString();
+  }
+  function formatUnits(value,decimals,maxFrac=8){
+    try{
+      let n=BigInt(value||"0"), base=10n**BigInt(decimals), a=n/base, b=(n%base).toString().padStart(decimals,"0");
+      b=b.slice(0,maxFrac).replace(/0+$/,"");
+      return b ? `${a}.${b}` : a.toString();
+    }catch{return "0";}
+  }
+  function toHex32(n){ return BigInt(n).toString(16).padStart(64,"0"); }
+  function padAddress(a){ return a.toLowerCase().replace(/^0x/,"").padStart(64,"0"); }
+
+  const PINNED = ["ETH","WETH","USDG","GLITCH","NVDA"];
+  function optionForKnown(k){
+    const o=document.createElement("option");
+    o.value=k;
+    o.textContent=`★ ${TOKENS[k].symbol} // ${TOKENS[k].name}`;
+    o.dataset.search=`${TOKENS[k].symbol} ${TOKENS[k].name} ${TOKENS[k].address||""}`.toLowerCase();
+    return o;
+  }
+  function optionForCatalog(t){
+    const o=document.createElement("option");
+    o.value=`ADDR:${t.address.toLowerCase()}`;
+    const px=t.priceUSD && Number(t.priceUSD)>0 ? ` // $${Number(t.priceUSD)<1?Number(t.priceUSD).toPrecision(4):Number(t.priceUSD).toFixed(2)}` : "";
+    o.textContent=`${t.symbol} // ${t.name}${px}`;
+    o.dataset.search=`${t.symbol} ${t.name} ${t.address}`.toLowerCase();
+    return o;
+  }
+  function customOption(){
+    const o=document.createElement("option");
+    o.value="CUSTOM";o.textContent="+ PASTE CUSTOM ERC-20 CONTRACT";
+    o.dataset.search="custom token contract address paste erc20";
+    return o;
+  }
+  function renderTokenSelect(sel, query="", preserve=true){
+    const previous=preserve?sel.value:"";
+    const q=String(query||"").trim().toLowerCase();
+    sel.innerHTML="";
+    PINNED.forEach(k=>{
+      const o=optionForKnown(k);
+      if(!q||o.dataset.search.includes(q)) sel.appendChild(o);
+    });
+    tokenCatalog.forEach(t=>{
+      // Don't duplicate pinned contracts.
+      if(PINNED.some(k=>TOKENS[k].address && TOKENS[k].address.toLowerCase()===t.address.toLowerCase())) return;
+      const o=optionForCatalog(t);
+      if(!q||o.dataset.search.includes(q)) sel.appendChild(o);
+    });
+    sel.appendChild(customOption());
+    if(previous && [...sel.options].some(o=>o.value===previous)) sel.value=previous;
+  }
+  renderTokenSelect(els.sellToken,"",false); renderTokenSelect(els.buyToken,"",false);
+  els.sellToken.value="GLITCH"; els.buyToken.value="ETH";
+
+  async function loadTokenCatalog(){
+    try{
+      const j=await api("/api/tokens");
+      tokenCatalog=Array.isArray(j.tokens)?j.tokens:[];
+      renderTokenSelect(els.sellToken,els.sellTokenSearch.value,true);
+      renderTokenSelect(els.buyToken,els.buyTokenSearch.value,true);
+      setStatus(`TOKEN CATALOG ONLINE // ${tokenCatalog.length} TOKENS INDEXED`,"ok");
+    }catch(e){
+      setStatus(`TOKEN CATALOG LIMITED // CUSTOM CONTRACT MODE AVAILABLE // ${e.message}`,"err");
+    }
+  }
+
+  async function api(path){
+    const r=await fetch(path,{headers:{"accept":"application/json"}});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.error||j.message||`HTTP ${r.status}`);
+    return j;
+  }
+
+  function applyHolderGate(){
+    const controls=[els.sellAmount,els.sellToken,els.buyToken,els.slippage,els.reverseBtn,els.maxBtn];
+    const unlocked=!!(account&&holderState.checked&&holderState.eligible);
+    controls.forEach(el=>{if(el)el.disabled=!unlocked});
+    document.querySelectorAll(".pair-buttons .mini").forEach(el=>el.disabled=!unlocked);
+
+    els.holderGate.classList.remove("granted","denied");
+    if(!account){
+      els.holderGateTitle.textContent="CONNECT WALLET TO UNLOCK SWAPS";
+      els.holderGateDetail.textContent="1+ DEAD PIXEL REQUIRED // ONCHAIN CHECK";
+      els.holderGateBadge.textContent="LOCKED";
+    }else if(!holderState.checked){
+      els.holderGateTitle.textContent="CHECKING DEAD PIXELS...";
+      els.holderGateDetail.textContent="READING NFT BALANCE ON ROBINHOOD CHAIN";
+      els.holderGateBadge.textContent="CHECKING";
+    }else if(holderState.eligible){
+      els.holderGate.classList.add("granted");
+      els.holderGateTitle.textContent="HOLDER ACCESS GRANTED";
+      els.holderGateDetail.textContent=`${holderState.balance} DEAD PIXELS DETECTED // SWAPS UNLOCKED`;
+      els.holderGateBadge.textContent="UNLOCKED";
+    }else{
+      els.holderGate.classList.add("denied");
+      els.holderGateTitle.textContent="ACCESS DENIED";
+      els.holderGateDetail.textContent="HOLD AT LEAST 1 DEAD PIXEL TO USE GLITCH ROUTER";
+      els.holderGateBadge.textContent="NO NFT";
+    }
+    updateAction();
+  }
+
+  async function checkHolder(){
+    holderState={checked:false,eligible:false,balance:0};
+    applyHolderGate();
+    if(!account)return;
+    try{
+      const h=await api(`/api/holder?wallet=${encodeURIComponent(account)}`);
+      holderState={checked:true,eligible:!!h.eligible,balance:Number(h.balance||0)};
+      if(holderState.eligible)setStatus(`HOLDER VERIFIED // ${holderState.balance} DEAD PIXELS // ROUTER UNLOCKED`,"ok");
+      else setStatus("DEAD PIXELS HOLDER REQUIRED // SWAPS LOCKED","err");
+    }catch(e){
+      holderState={checked:true,eligible:false,balance:0};
+      setStatus(`HOLDER CHECK ERROR // ${e.message}`,"err");
+    }
+    applyHolderGate();
+  }
+
+  async function resolveKnownToken(key){
+    const t={...TOKENS[key]};
+    if(t.native) return t;
+    if(t.decimals==null){
+      const m=await api(`/api/token?address=${encodeURIComponent(t.address)}`);
+      t.symbol=m.symbol||t.symbol; t.name=m.name||t.name; t.decimals=Number(m.decimals);
+      TOKENS[key]={...TOKENS[key],...t};
+    }
+    return t;
+  }
+
+  async function resolveCustom(side){
+    const input=side==="sell"?els.sellCustom:els.buyCustom;
+    const meta=side==="sell"?els.sellCustomMeta:els.buyCustomMeta;
+    const address=input.value.trim();
+    if(!addrOk(address)){ meta.textContent=address?"INVALID CONTRACT ADDRESS":""; if(side==="sell")customSell=null;else customBuy=null; return null; }
+    meta.textContent="READING TOKEN...";
+    try{
+      const m=await api(`/api/token?address=${encodeURIComponent(address)}`);
+      const t={symbol:m.symbol||"TOKEN",name:m.name||"Custom token",address:m.address,decimals:Number(m.decimals)};
+      meta.textContent=`${t.symbol} // ${t.decimals} DECIMALS`;
+      if(side==="sell")customSell=t; else customBuy=t;
+      return t;
+    }catch(e){ meta.textContent=`ERROR // ${e.message}`; if(side==="sell")customSell=null;else customBuy=null; return null; }
+  }
+
+  async function currentToken(side){
+    const sel=side==="sell"?els.sellToken:els.buyToken;
+    if(sel.value==="CUSTOM"){
+      const c=side==="sell"?customSell:customBuy;
+      return c || await resolveCustom(side);
+    }
+    if(sel.value.startsWith("ADDR:")){
+      const a=sel.value.slice(5).toLowerCase();
+      const t=tokenCatalog.find(x=>x.address.toLowerCase()===a);
+      if(t) return {...t,native:t.address.toLowerCase()===NATIVE};
+      const m=await api(`/api/token?address=${encodeURIComponent(a)}`);
+      return {symbol:m.symbol||"TOKEN",name:m.name||"ERC20",address:m.address,decimals:Number(m.decimals)};
+    }
+    return await resolveKnownToken(sel.value);
+  }
+
+  function updateCustomUI(){
+    els.sellCustomWrap.classList.toggle("show",els.sellToken.value==="CUSTOM");
+    els.buyCustomWrap.classList.toggle("show",els.buyToken.value==="CUSTOM");
+    const values=[els.sellToken.value,els.buyToken.value].join("|").toLowerCase();
+    const stockAddresses=new Set(stockRegistry.map(x=>x.address.toLowerCase()));
+    const selectedAddrs=[els.sellToken.value,els.buyToken.value].filter(v=>String(v).startsWith("ADDR:")).map(v=>v.slice(5).toLowerCase());
+    const isRwa=values.includes("nvda")||values.includes(TOKENS.NVDA.address.toLowerCase())||!!customSell?.rwa||!!customBuy?.rwa||stockAddresses.has(customSell?.address?.toLowerCase?.()||"")||stockAddresses.has(customBuy?.address?.toLowerCase?.()||"")||selectedAddrs.some(a=>stockAddresses.has(a));
+    els.rwa.classList.toggle("show",isRwa);
+  }
+  updateCustomUI();
+
+  async function ensureChain(){
+    if(!window.ethereum) throw new Error("NO EVM WALLET DETECTED");
+    const current=await ethereum.request({method:"eth_chainId"});
+    if(current.toLowerCase()===CHAIN_HEX) return;
+    try{
+      await ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:CHAIN_HEX}]});
+    }catch(e){
+      if(e.code!==4902) throw e;
+      await ethereum.request({method:"wallet_addEthereumChain",params:[{
+        chainId:CHAIN_HEX,chainName:"Robinhood Chain",nativeCurrency:{name:"Ether",symbol:"ETH",decimals:18},
+        rpcUrls:["https://rpc.mainnet.chain.robinhood.com/"],blockExplorerUrls:[EXPLORER]
+      }]});
+    }
+  }
+
+  async function connect(){
+    try{
+      if(!window.ethereum) throw new Error("INSTALL AN EVM WALLET FIRST");
+      await ensureChain();
+      const a=await ethereum.request({method:"eth_requestAccounts"});
+      account=a[0];
+      els.walletBtn.textContent=short(account); els.walletBtn.classList.add("connected");
+      if(els.portalWalletBtn){els.portalWalletBtn.textContent=short(account);els.portalWalletBtn.classList.add("connected");}
+      setStatus("WALLET CONNECTED // ROBINHOOD CHAIN","ok");
+      await updateBalance();
+      await checkHolder();
+      updateAction();
+      if(holderState.eligible)scheduleQuote(150);
+    }catch(e){ setStatus(`WALLET ERROR // ${e.message}`,"err"); }
+  }
+
+  async function rpc(method,params){
+    if(!window.ethereum) throw new Error("NO WALLET");
+    return ethereum.request({method,params});
+  }
+
+  async function getBalance(token){
+    if(!account) return 0n;
+    if(token.native) return BigInt(await rpc("eth_getBalance",[account,"latest"]));
+    const data="0x70a08231"+padAddress(account);
+    return BigInt(await rpc("eth_call",[{to:token.address,data},"latest"]));
+  }
+
+  async function updateBalance(){
+    try{
+      const t=await currentToken("sell"); if(!t||!account){els.maxBtn.textContent="BALANCE: --";return;}
+      const b=await getBalance(t);
+      els.maxBtn.dataset.raw=b.toString(); els.maxBtn.textContent=`BALANCE: ${formatUnits(b,t.decimals,5)} ${t.symbol}`;
+    }catch{els.maxBtn.textContent="BALANCE: --";}
+  }
+
+  function quoteUrl(provider){
+    return null;
+  }
+
+  async function fetchQuotes(provider="all"){
+    if(!account) throw new Error("CONNECT WALLET");
+    if(!holderState.eligible) throw new Error("DEAD PIXELS HOLDER REQUIRED");
+    const sell=await currentToken("sell"), buy=await currentToken("buy");
+    if(!sell||!buy) throw new Error("TOKEN NOT READY");
+    if(sell.address.toLowerCase()===buy.address.toLowerCase()) throw new Error("SELECT TWO DIFFERENT TOKENS");
+    const amount=parseUnits(els.sellAmount.value,sell.decimals);
+    if(BigInt(amount)<=0n) throw new Error("ENTER AN AMOUNT");
+    const params=new URLSearchParams({
+      sellToken:sell.address,buyToken:buy.address,sellAmount:amount,taker:account,
+      slippageBps:els.slippage.value,provider
+    });
+    const j=await api(`/api/quote?${params.toString()}`);
+    return {data:j,sell,buy,amount};
+  }
+
+  function renderQuotes(data,buy){
+    quotes=data.quotes||[];
+    els.baselinePanel.className="baseline-panel";
+    if(data.baseline?.available){
+      els.baselineText.textContent="UNISWAP QUOTE READY";
+    }else{
+      const ue=(data.errors||[]).find(x=>String(x.provider||"").toUpperCase().includes("UNISWAP"));
+      els.baselineText.textContent=ue ? `UNISWAP QUOTE FAILED // ${ue.error}` : "UNISWAP BASELINE UNAVAILABLE";
+    }
+
+    if(!quotes.length){
+      els.quotePanel.innerHTML=`<div class="empty">NO EXECUTABLE ROUTE FOUND.<br>${escapeHtml((data.errors||[]).map(x=>x.provider+": "+x.error).join(" // "))}</div>`;
+      selectedQuote=null; els.buyAmount.textContent="0.0"; updateAction(); return;
+    }
+
+    selectedQuote=quotes[0];
+    els.buyAmount.textContent=formatUnits(selectedQuote.buyAmount,buy.decimals,8);
+
+    const save=Number(data.savingsVsUniswapUsd);
+    const pct=Number(data.savingsVsUniswapPct);
+    if(data.baseline?.available && Number.isFinite(save) && save>0.000001){
+      els.baselinePanel.classList.add("saved");
+      els.baselineText.textContent=`GLITCH SAVES ~$${save.toFixed(4)}${Number.isFinite(pct)?` // +${pct.toFixed(3)}%`:""}`;
+    }else if(data.baseline?.available){
+      els.baselinePanel.classList.add("baseline-best");
+      els.baselineText.textContent=selectedQuote.provider==="uniswapapi"
+        ?"UNISWAP IS BEST // USING UNISWAP"
+        :"NO MATERIAL SAVING VS UNISWAP";
+    }
+
+    els.quotePanel.innerHTML=quotes.map((q,i)=>{
+      const out=formatUnits(q.buyAmount,buy.decimals,8);
+      const min=q.minBuyAmount?formatUnits(q.minBuyAmount,buy.decimals,7):"--";
+      const gas=q.gasUsd!=null?`USER GAS ~$${Number(q.gasUsd).toFixed(4)}`:"GAS EST. AT EXECUTION";
+      const net=q.netUsd!=null?`NET ~$${Number(q.netUsd).toFixed(4)}`:"NET BASED ON OUTPUT";
+      const tag=i===0?'<span class="badge">BEST NET</span>':(q.baseline?'<span class="badge" style="background:#777;color:#000">BASELINE</span>':"");
+      return `<div class="quote ${i===0?"best":""}" data-provider="${escapeHtml(q.provider)}">
+        <div class="qleft"><b>${escapeHtml(q.label)} ${tag}</b>
+        <small>${escapeHtml(q.route||"SMART ROUTE")} // ${gas}</small></div>
+        <div class="qright"><b>${escapeHtml(out)} ${escapeHtml(buy.symbol)}</b><small>${escapeHtml(net)} // MIN ${escapeHtml(min)}</small></div>
+      </div>`;
+    }).join("");
+
+    [...els.quotePanel.querySelectorAll(".quote")].forEach(el=>el.addEventListener("click",()=>{
+      const p=el.dataset.provider, q=quotes.find(x=>x.provider===p); if(!q)return;
+      selectedQuote=q; els.buyAmount.textContent=formatUnits(q.buyAmount,buy.decimals,8);
+      [...els.quotePanel.children].forEach(x=>x.classList.remove("best")); el.classList.add("best");
+      updateAction();
+    }));
+    updateAction();
+  }
+
+  async function getQuote(){
+    if(quoteAbort) quoteAbort.abort();
+    if(!account || !holderState.eligible || !els.sellAmount.value || Number(els.sellAmount.value)<=0){updateAction();return;}
+    try{
+      setStatus("SCANNING // UNISWAP BASELINE VS NORDSTERN VS LI.FI...");
+      els.quotePanel.innerHTML='<div class="empty">SCANNING UNISWAP BASELINE ENGINE...</div>';
+      const {data,buy}=await fetchQuotes("all");
+      renderQuotes(data,buy);
+      const enabled=(data.providers||[]).filter(x=>x.enabled).map(x=>x.name).join(" + ");
+      if(enabled) els.routingLabel.textContent=enabled.toUpperCase();
+      setStatus(`${quotes.length} ROUTE${quotes.length===1?"":"S"} FOUND // QUOTE EXPIRES QUICKLY`,"ok");
+    }catch(e){
+      quotes=[];selectedQuote=null;els.buyAmount.textContent="0.0";
+      els.quotePanel.innerHTML=`<div class="empty">QUOTE ERROR<br>${escapeHtml(e.message)}</div>`;
+      setStatus(`QUOTE ERROR // ${e.message}`,"err"); updateAction();
+    }
+  }
+
+  function scheduleQuote(ms=600){
+    clearTimeout(quoteTimer);
+    quoteTimer=setTimeout(()=>{if(account&&els.sellAmount.value)getQuote()},ms);
+  }
+
+  async function allowance(token,spender){
+    if(token.native) return 2n**256n-1n;
+    const data="0xdd62ed3e"+padAddress(account)+padAddress(spender);
+    return BigInt(await rpc("eth_call",[{to:token.address,data},"latest"]));
+  }
+
+  async function waitReceipt(hash,timeout=120000){
+    const started=Date.now();
+    while(Date.now()-started<timeout){
+      const r=await rpc("eth_getTransactionReceipt",[hash]);
+      if(r) return r;
+      await new Promise(res=>setTimeout(res,1600));
+    }
+    throw new Error("TRANSACTION CONFIRMATION TIMEOUT");
+  }
+
+  async function approveExact(token,spender,amount){
+    const data="0x095ea7b3"+padAddress(spender)+toHex32(amount);
+    setStatus(`APPROVAL REQUIRED // APPROVE ${token.symbol} TO SELECTED ROUTER`);
+    const hash=await rpc("eth_sendTransaction",[{from:account,to:token.address,data,value:"0x0"}]);
+    setStatus(`APPROVAL SENT // ${short(hash)} // WAITING...`);
+    const rc=await waitReceipt(hash);
+    if(rc.status!=="0x1") throw new Error("APPROVAL REVERTED");
+    return hash;
+  }
+
+
+  function preparedWalletTx(t){
+    if(!t||!addrOk(t.to))throw new Error("INVALID PREPARED TRANSACTION");
+    const tx={from:account,to:t.to,data:t.data||"0x",value:toRpcHex(t.value||"0x0")};
+    if(t.gas)tx.gas=toRpcHex(t.gas);
+    if(t.gasPrice)tx.gasPrice=toRpcHex(t.gasPrice);
+    if(t.maxFeePerGas)tx.maxFeePerGas=toRpcHex(t.maxFeePerGas);
+    if(t.maxPriorityFeePerGas)tx.maxPriorityFeePerGas=toRpcHex(t.maxPriorityFeePerGas);
+    return tx;
+  }
+
+  async function sendPrepared(t,label){
+    if(!t)return null;
+    setStatus(`${label} // WALLET CONFIRMATION`);
+    const hash=await rpc("eth_sendTransaction",[preparedWalletTx(t)]);
+    setStatus(`${label} SENT // ${short(hash)} // WAITING...`);
+    const rc=await waitReceipt(hash,180000);
+    if(rc.status!=="0x1")throw new Error(`${label} REVERTED`);
+    return hash;
+  }
+
+  async function signPermitData(permitData){
+    if(!permitData)return null;
+    const types=permitData.types||{};
+    const primaryType=Object.keys(types).find(k=>k!=="EIP712Domain");
+    if(!primaryType)throw new Error("UNISWAP PERMIT PRIMARY TYPE MISSING");
+    const payload={
+      domain:permitData.domain||{},
+      types,
+      primaryType,
+      message:permitData.values||permitData.message||{}
+    };
+    setStatus("UNISWAP PERMIT2 // SIGN MESSAGE // NO GAS");
+    return rpc("eth_signTypedData_v4",[account,JSON.stringify(payload)]);
+  }
+
+  async function pollUniswapOrder(orderId){
+    const started=Date.now();
+    while(Date.now()-started<180000){
+      const st=await api(`/api/uniswap-order?orderId=${encodeURIComponent(orderId)}`);
+      const status=String(st.orderStatus||"open").toLowerCase();
+      if(status==="filled"){
+        if(st.txHash){
+          els.status.innerHTML=`UNISWAPX FILLED // <a href="${EXPLORER}/tx/${st.txHash}" target="_blank" rel="noopener">${short(st.txHash)} ↗</a>`;
+          els.status.className="statuslog ok";
+        }else setStatus("UNISWAPX ORDER FILLED // USER SWAP GAS = $0","ok");
+        return;
+      }
+      if(["expired","error","cancelled","insufficient-funds"].includes(status))
+        throw new Error(`UNISWAPX ORDER ${status.toUpperCase()}`);
+      setStatus(`UNISWAPX ORDER ${status.toUpperCase()} // FILLER NETWORK WORKING...`);
+      await new Promise(r=>setTimeout(r,2500));
+    }
+    setStatus(`UNISWAPX ORDER OPEN // ${orderId.slice(0,18)}...`,"ok");
+  }
+
+  async function executeUniswapOfficial(){
+    setStatus("REFRESHING UNISWAP OFFICIAL BEST_PRICE...");
+    let fresh=await fetchQuotes("uniswapapi");
+    let q=(fresh.data.quotes||[])[0];
+    if(!q||q.provider!=="uniswapapi"||!q.execution)throw new Error("NO FRESH UNISWAP QUOTE");
+
+    // API may require a revoke before approval for unusual ERC20s.
+    if(q.cancelTransaction){
+      await sendPrepared(q.cancelTransaction,"UNISWAP APPROVAL RESET");
+      fresh=await fetchQuotes("uniswapapi");
+      q=(fresh.data.quotes||[])[0];
+    }
+    if(q.approvalTransaction){
+      await sendPrepared(q.approvalTransaction,"UNISWAP TOKEN APPROVAL");
+      // Permit/quote data are time sensitive: always refresh after approval.
+      fresh=await fetchQuotes("uniswapapi");
+      q=(fresh.data.quotes||[])[0];
+      if(!q||!q.execution)throw new Error("UNISWAP QUOTE REFRESH FAILED");
+    }
+
+    const signature=await signPermitData(q.execution.permitData);
+    const r=await fetch("/api/uniswap-execute",{
+      method:"POST",
+      headers:{"content-type":"application/json"},
+      body:JSON.stringify({
+        wallet:account,
+        routing:q.execution.routing,
+        quote:q.execution.quote,
+        permitData:q.execution.permitData,
+        signature
+      })
+    });
+    const out=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(out.error||`UNISWAP EXECUTION HTTP ${r.status}`);
+
+    if(out.kind==="ORDER"){
+      setStatus(`UNISWAPX GASLESS ORDER SUBMITTED // ${out.orderStatus||"OPEN"}`,"ok");
+      await pollUniswapOrder(out.orderId);
+      await updateBalance();scheduleQuote(500);
+      return;
+    }
+
+    if(out.kind==="SWAP"){
+      const hash=await rpc("eth_sendTransaction",[preparedWalletTx(out.transaction)]);
+      setStatus(`UNISWAP SWAP SENT // ${short(hash)} // WAITING...`);
+      const rc=await waitReceipt(hash,180000);
+      if(rc.status!=="0x1")throw new Error("UNISWAP SWAP REVERTED");
+      els.status.innerHTML=`UNISWAP OFFICIAL CONFIRMED // <a href="${EXPLORER}/tx/${hash}" target="_blank" rel="noopener">${short(hash)} ↗</a>`;
+      els.status.className="statuslog ok";
+      await updateBalance();scheduleQuote(500);
+      return;
+    }
+
+    throw new Error("UNKNOWN UNISWAP EXECUTION TYPE");
+  }
+
+  async function execute(){
+    if(!selectedQuote){ await getQuote(); if(!selectedQuote)return; }
+    els.actionBtn.disabled=true;
+    try{
+      await ensureChain();
+      if(selectedQuote.provider==="uniswapapi"){
+        await executeUniswapOfficial();
+        return;
+      }
+      const sell=await currentToken("sell");
+      const provider=selectedQuote.provider;
+      const amount=parseUnits(els.sellAmount.value,sell.decimals);
+
+      // Approval is exact-to-trade and only to the spender returned by the winning provider.
+      if(!sell.native && selectedQuote.approvalSpender){
+        const a=await allowance(sell,selectedQuote.approvalSpender);
+        if(a<BigInt(amount)) await approveExact(sell,selectedQuote.approvalSpender,amount);
+      }
+
+      // Refresh the same provider after approval so we don't execute a stale quote.
+      setStatus(`REFRESHING ${provider.toUpperCase()} QUOTE BEFORE EXECUTION...`);
+      const fresh=await fetchQuotes(provider);
+      const q=(fresh.data.quotes||[])[0];
+      if(!q||!q.transaction||!addrOk(q.transaction.to)) throw new Error("NO FRESH EXECUTABLE TRANSACTION");
+
+      const tx={from:account,to:q.transaction.to,data:q.transaction.data||"0x",value:q.transaction.value||"0x0"};
+      if(q.transaction.gas) tx.gas=toRpcHex(q.transaction.gas);
+      if(q.transaction.gasPrice) tx.gasPrice=toRpcHex(q.transaction.gasPrice);
+
+      setStatus(`WALLET CONFIRMATION // ${q.label.toUpperCase()} ROUTE`);
+      const hash=await rpc("eth_sendTransaction",[tx]);
+      setStatus(`SWAP SENT // ${short(hash)} // WAITING FOR CONFIRMATION...`);
+      const rc=await waitReceipt(hash,180000);
+      if(rc.status!=="0x1") throw new Error("SWAP REVERTED");
+      setStatus(`SWAP CONFIRMED // ${short(hash)} // VIEW ON EXPLORER`,"ok");
+      els.status.innerHTML=`SWAP CONFIRMED // <a href="${EXPLORER}/tx/${hash}" target="_blank" rel="noopener">${short(hash)} ↗</a>`;
+      els.status.className="statuslog ok";
+      await updateBalance(); scheduleQuote(500);
+    }catch(e){
+      setStatus(`EXECUTION ERROR // ${e.message||e}`,"err");
+    }finally{updateAction();}
+  }
+
+  function toRpcHex(v){
+    if(v==null)return undefined;
+    const s=String(v);
+    if(/^0x[0-9a-f]+$/i.test(s)) return s;
+    return "0x"+BigInt(s).toString(16);
+  }
+
+  function updateAction(){
+    if(!account){els.actionBtn.textContent="CONNECT WALLET";els.actionBtn.disabled=false;return;}
+    if(!holderState.checked){els.actionBtn.textContent="CHECKING HOLDER ACCESS...";els.actionBtn.disabled=true;return;}
+    if(!holderState.eligible){els.actionBtn.textContent="DEAD PIXELS HOLDER REQUIRED";els.actionBtn.disabled=true;return;}
+    if(!els.sellAmount.value||Number(els.sellAmount.value)<=0){els.actionBtn.textContent="ENTER AMOUNT";els.actionBtn.disabled=true;return;}
+    if(!selectedQuote){els.actionBtn.textContent="GET BEST QUOTE";els.actionBtn.disabled=false;return;}
+    els.actionBtn.textContent=selectedQuote.provider==="uniswapapi" && selectedQuote.execution?.kind==="ORDER"
+      ? "SIGN GASLESS UNISWAPX ORDER"
+      : `EXECUTE VIA ${selectedQuote.label.toUpperCase()}`;
+    els.actionBtn.disabled=false;
+  }
+
+  async function setPair(a,b){
+    els.sellToken.value=a; els.buyToken.value=b; customSell=customBuy=null; updateCustomUI(); selectedQuote=null;quotes=[];els.buyAmount.textContent="0.0";
+    await updateBalance(); scheduleQuote(150); updateAction();
+  }
+
+  async function reversePair(){
+    const a=els.sellToken.value,b=els.buyToken.value;
+    const ca=customSell, cb=customBuy, va=els.sellCustom.value,vb=els.buyCustom.value;
+    els.sellToken.value=b;els.buyToken.value=a;customSell=cb;customBuy=ca;els.sellCustom.value=vb;els.buyCustom.value=va;
+    updateCustomUI();selectedQuote=null;quotes=[];els.buyAmount.textContent="0.0";await updateBalance();scheduleQuote(150);updateAction();
+  }
+
+  function bindTokenSearch(input,sel,side){
+    input.addEventListener("input",()=>{
+      const q=input.value.trim();
+      // Direct contract paste becomes custom-token mode immediately.
+      if(addrOk(q)){
+        sel.value="CUSTOM";
+        if(side==="sell"){els.sellCustom.value=q;resolveCustom("sell").then(()=>updateBalance()).then(()=>scheduleQuote(100));}
+        else{els.buyCustom.value=q;resolveCustom("buy").then(()=>scheduleQuote(100));}
+        updateCustomUI();selectedQuote=null;updateAction();return;
+      }
+      renderTokenSelect(sel,q,true);
+    });
+  }
+  bindTokenSearch(els.sellTokenSearch,els.sellToken,"sell");
+  bindTokenSearch(els.buyTokenSearch,els.buyToken,"buy");
+
+
+  // ================= PORTAL V3.0–V3.5 UNIFIED MODULES =================
+  const qid=id=>document.getElementById(id);
+  const num=(v,d=0)=>{const x=Number(v);return Number.isFinite(x)?x:d};
+  const money=v=>v!=null&&v!==""&&Number.isFinite(Number(v))?`$${Number(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:4})}`:"--";
+  const pct=v=>v!=null&&v!==""&&Number.isFinite(Number(v))?`${Number(v)>=0?"+":""}${Number(v).toFixed(3)}%`:"--";
+  function stockBySymbol(symbol){return stockRegistry.find(x=>x.symbol===String(symbol||"").toUpperCase())||null;}
+  function stockToken(symbol){const x=stockBySymbol(symbol);return x?{symbol:x.symbol,name:x.name,address:x.address,decimals:18,rwa:true}:null;}
+  function scoreClass(s){return s>=90?"":s>=70?"warn":"bad";}
+  function optionHtml(x){return `<option value="${escapeHtml(x.symbol)}">${escapeHtml(x.symbol)} // ${escapeHtml(x.name)}</option>`;}
+  function stockVisual(el,symbol){
+    if(!el)return;const x=stockBySymbol(symbol);if(!x){el.innerHTML="<span>--</span>";return;}
+    el.innerHTML=`${x.logoUrl?`<img src="${escapeHtml(x.logoUrl)}" alt="">`:""}<b>${escapeHtml(x.symbol)}</b><small>${escapeHtml(x.name)}</small>`;
+  }
+  function switchPage(id){
+    document.querySelectorAll(".portal-page").forEach(x=>x.classList.toggle("active",x.id===id));
+    document.querySelectorAll(".nav-tab").forEach(x=>x.classList.toggle("active",x.dataset.page===id));
+    window.scrollTo({top:0,behavior:"smooth"});
+    if(id==="stocksPage"&&!stockRegistry.length)loadStockRegistry();
+    if(id==="alphaPage"){if(!alphaOverview)loadAlphaOverview();if(!alphaJustBorn.length)loadAlphaJustBorn();}
+    if(id==="ordersPage")checkExecutionOrders();
+  }
+  document.querySelectorAll(".nav-tab").forEach(b=>b.addEventListener("click",()=>switchPage(b.dataset.page)));
+  if(els.portalWalletBtn)els.portalWalletBtn.addEventListener("click",connect);
+
+  async function loadStockRegistry(){
+    try{
+      const j=await api("/api/stocks?action=registry");stockRegistry=j.assets||[];
+      qid("registryCount").textContent=`${stockRegistry.length} ASSETS`;
+      const opts=stockRegistry.map(optionHtml).join("");
+      ["stockAnalyzeSymbol","rotateSell","rotateBuy","orderStock"].forEach(id=>{const e=qid(id);if(e)e.innerHTML=opts});
+      const defaults={stockAnalyzeSymbol:"NVDA",rotateSell:"AAPL",rotateBuy:"NVDA",orderStock:"NVDA"};
+      Object.entries(defaults).forEach(([id,v])=>{const e=qid(id);if(e&&stockBySymbol(v))e.value=v});
+      if(qid("rotateBuy")&&qid("rotateBuy").value===qid("rotateSell")?.value){const alt=stockRegistry.find(x=>x.symbol!==qid("rotateSell").value);if(alt)qid("rotateBuy").value=alt.symbol;}
+      renderRegistry();renderPortfolioRows();updateRotateViz();
+      await loadMarketScanner();
+    }catch(e){if(qid("scannerStatus"))qid("scannerStatus").textContent=`REGISTRY ERROR // ${e.message||e}`;}
+  }
+  function renderRegistry(){
+    const el=qid("registryList");if(!el)return;const q=String(qid("registrySearch")?.value||"").toLowerCase();
+    const arr=stockRegistry.filter(x=>!q||`${x.symbol} ${x.name} ${x.address}`.toLowerCase().includes(q)).slice(0,90);
+    el.innerHTML=arr.map(x=>`<div class="registry-item" data-stock="${escapeHtml(x.symbol)}">${x.logoUrl?`<img src="${escapeHtml(x.logoUrl)}" alt="">`:""}<div><b>${escapeHtml(x.symbol)}</b><small>${escapeHtml(x.name)}</small></div></div>`).join("")||'<div class="result-empty">NO MATCH.</div>';
+    el.querySelectorAll("[data-stock]").forEach(r=>r.addEventListener("click",()=>{qid("stockAnalyzeSymbol").value=r.dataset.stock;switchPage("stocksPage");analyzeStockExecution(r.dataset.stock);}));
+  }
+  async function loadMarketScanner(){
+    const status=qid("scannerStatus"),list=qid("scannerList");if(!status||!list)return;
+    const q=String(qid("scannerSearch")?.value||"").trim().toUpperCase();
+    let symbols=[];
+    if(q){symbols=stockRegistry.filter(x=>x.symbol.includes(q)||x.name.toUpperCase().includes(q)).slice(0,12).map(x=>x.symbol);}
+    else{const pref=["NVDA","AAPL","TSLA","MSFT","AMZN","META","GOOGL","QQQ","SPY","PLTR","COIN","AMD"];symbols=pref.filter(x=>stockBySymbol(x));if(symbols.length<8)symbols.push(...stockRegistry.slice(0,8-symbols.length).map(x=>x.symbol));}
+    symbols=[...new Set(symbols)].slice(0,12);if(!symbols.length){list.innerHTML='<div class="result-empty">NO STOCK TOKEN MATCH.</div>';return;}
+    status.textContent="SCANNING MARKET...";list.innerHTML='<div class="loading-bar"><i></i></div>';
+    try{
+      const j=await api(`/api/stocks?action=scan&symbols=${encodeURIComponent(symbols.join(","))}`);stockScanItems=j.items||[];renderScanner();status.textContent=`${stockScanItems.length} MARKETS // LIVE`;
+    }catch(e){status.textContent="SCAN FAILED";list.innerHTML=`<div class="result-empty">${escapeHtml(e.message||e)}</div>`;}
+  }
+  function renderScanner(){
+    const list=qid("scannerList");if(!list)return;
+    list.innerHTML=stockScanItems.map(x=>`<div class="scanner-row" data-stock="${escapeHtml(x.symbol)}"><div class="stock-id">${x.logoUrl?`<img class="stock-logo" src="${escapeHtml(x.logoUrl)}" alt="">`:""}<div><b>${escapeHtml(x.symbol)}</b><small>${escapeHtml(x.name)}</small></div></div><div class="scanner-num"><b>${money(x.market?.fairValue)}</b><small>FAIR TOKEN VALUE</small></div><div class="scanner-num"><b>${num(x.market?.spreadBps).toFixed(2)} bps</b><small>SPREAD</small></div><div class="score-pill ${scoreClass(x.marketQuality?.score||0)}">${x.marketQuality?.score||0}/100</div></div>`).join("")||'<div class="result-empty">NO MARKET DATA.</div>';
+    list.querySelectorAll("[data-stock]").forEach(r=>r.addEventListener("click",()=>{qid("stockAnalyzeSymbol").value=r.dataset.stock;analyzeStockExecution(r.dataset.stock);}));
+  }
+  function scoreMarkup(j){
+    const s=j.glitchScore||{},c=s.components||{},ex=j.execution||{},f=j.fair||{};
+    return `<div class="score-big"><div><span>GLITCH SCORE</span><strong>${s.score??"--"}</strong></div><div style="text-align:right"><b>${escapeHtml(s.verdict||"--")}</b><span style="display:block;margin-top:5px">EXECUTION QUALITY</span></div></div><div class="score-components"><div class="score-component"><small>PRICE QUALITY</small><b>${c.priceQuality??"--"}/100</b></div><div class="score-component"><small>GAS EFFICIENCY</small><b>${c.gasEfficiency??"--"}/100</b></div><div class="score-component"><small>SPREAD QUALITY</small><b>${c.spreadQuality??"--"}/100</b></div><div class="score-component"><small>MARKET QUALITY</small><b>${c.marketQuality??"--"}/100</b></div></div><div class="metric-list"><div class="metric"><span>FAIR TOKEN VALUE</span><b>${money(f.value)}</b></div><div class="metric"><span>EXECUTABLE PRICE</span><b>${money(ex.effectivePrice)}</b></div><div class="metric ${num(ex.deviationPct)<=0.25?"good":"bad"}"><span>EXECUTION DEVIATION</span><b>${pct(ex.deviationPct)}</b></div><div class="metric"><span>EST. USER GAS</span><b>${money(ex.gasUsd)}</b></div><div class="metric"><span>BEST ROUTE</span><b>${escapeHtml(ex.label||"--")}</b></div></div>`;
+  }
+  async function analyzeStockExecution(symbol=qid("stockAnalyzeSymbol")?.value){
+    const box=qid("stockScoreBox"),btn=qid("tradeStockBtn"),state=qid("stockDetailState");if(!box)return;
+    const x=stockBySymbol(symbol);if(!x)return;
+    if(!account){box.innerHTML='<div class="result-empty">CONNECT A HOLDER WALLET TO RUN EXECUTABLE ROUTE ANALYSIS.</div>';btn.disabled=true;return;}
+    if(!holderState.eligible){box.innerHTML='<div class="result-empty">DEAD PIXELS HOLDER ACCESS REQUIRED FOR EXECUTABLE QUOTES.</div>';btn.disabled=true;return;}
+    const amt=num(qid("stockAnalyzeAmount")?.value);if(!(amt>0))return;
+    state.textContent="ANALYZING...";box.innerHTML='<div class="loading-bar"><i></i></div>';btn.disabled=true;
+    try{
+      const j=await api(`/api/stocks?action=execution&symbol=${encodeURIComponent(symbol)}&wallet=${encodeURIComponent(account)}&side=buy&amount=${encodeURIComponent(amt)}`);selectedStockAnalysis=j;box.innerHTML=scoreMarkup(j);
+      const max=num(qid("stockShieldMax")?.value,.25),pass=num(j.execution?.adverseDeviationPct,999)<=max&&!j.fair?.isTradingHalt;
+      box.insertAdjacentHTML("beforeend",`<div class="shield ${pass?"pass":"block"}"><div class="shield-head"><span>FAIR VALUE SHIELD</span><b>${pass?"PASS // EXECUTION ALLOWED":"BLOCKED // DEVIATION TOO HIGH"}</b></div><small>MAX ${max.toFixed(3)}% // CURRENT ${num(j.execution?.adverseDeviationPct).toFixed(3)}%</small></div>`);
+      btn.disabled=!pass;state.textContent=`${j.symbol} // ${j.glitchScore?.verdict||"READY"}`;
+    }catch(e){box.innerHTML=`<div class="result-empty">ANALYSIS ERROR // ${escapeHtml(e.message||e)}</div>`;state.textContent="ERROR";}
+  }
+  async function loadIntoRouter(sell,buy,amount){
+    if(!sell||!buy)return;switchPage("routerPage");
+    function setSide(side,t){
+      const sel=side==="sell"?els.sellToken:els.buyToken,input=side==="sell"?els.sellCustom:els.buyCustom;
+      const known=Object.keys(TOKENS).find(k=>TOKENS[k].address&&TOKENS[k].address.toLowerCase()===t.address.toLowerCase());
+      if(known){sel.value=known;if(side==="sell")customSell=null;else customBuy=null;}
+      else{sel.value="CUSTOM";input.value=t.address;if(side==="sell")customSell={...t};else customBuy={...t};}
+    }
+    setSide("sell",sell);setSide("buy",buy);els.sellAmount.value=String(amount);selectedQuote=null;quotes=[];els.buyAmount.textContent="0.0";updateCustomUI();await updateBalance();scheduleQuote(100);updateAction();
+  }
+  async function tradeSelectedStock(){const j=selectedStockAnalysis;if(!j)return;await loadIntoRouter(TOKENS.USDG,stockToken(j.symbol),j.amount);}
+
+  // ================= GLITCH ALPHA V3.7 =================
+  const ALPHA_WATCH_STORE="dead_pixels_alpha_watch_v37";
+  let alphaOverview=null,alphaCatalog=[],alphaJustBorn=[],alphaFeedState=[],alphaSelected=null,alphaView="trending",alphaLive=true,alphaSearchMode=false;
+  let alphaWatch={};
+  try{alphaWatch=JSON.parse(localStorage.getItem(ALPHA_WATCH_STORE)||"{}")||{};}catch{alphaWatch={};}
+  const compact=v=>{const x=Number(v);if(!Number.isFinite(x))return "--";return new Intl.NumberFormat("en-US",{notation:"compact",maximumFractionDigits:2}).format(x)};
+  const alphaMoney=v=>{const x=Number(v);if(!Number.isFinite(x)||x===0)return x===0?"$0":"--";if(Math.abs(x)>=1000)return `$${compact(x)}`;if(Math.abs(x)>=1)return `$${x.toLocaleString(undefined,{maximumFractionDigits:4})}`;if(Math.abs(x)>=.0001)return `$${x.toFixed(6)}`;return `$${x.toExponential(2)}`;};
+  const alphaPct=v=>{const x=Number(v);if(!Number.isFinite(x))return "--";return `${x>=0?"+":""}${x.toFixed(Math.abs(x)>=100?0:2)}%`;};
+  const alphaAge=s=>{const x=Number(s);if(!Number.isFinite(x))return "--";if(x<60)return `${Math.max(0,Math.floor(x))}s`;if(x<3600)return `${Math.floor(x/60)}m`;if(x<86400)return `${Math.floor(x/3600)}h ${Math.floor(x%3600/60)}m`;if(x<2592000)return `${Math.floor(x/86400)}d`;return `${Math.floor(x/2592000)}mo`;};
+  function alphaQuickRisk(x){let r=0;const liq=num(x.liquidityUsd),h1=x.txns?.h1||{};if(liq&&liq<3000)r+=35;else if(liq&&liq<10000)r+=18;if(num(h1.buys)>=5&&!num(h1.sells))r+=25;if(x.ageSeconds!=null&&x.ageSeconds<300)r+=12;if(num(x.volume?.h24)>liq*8&&liq>0)r+=12;return Math.min(100,r);}
+  function alphaScoreClass(s){return s>=80?"":s>=55?"mid":"low";}
+  function alphaChangeClass(v){return num(v)>=0?"up":"down";}
+  function alphaImg(x,sizeClass="alpha-avatar"){return x?.imageUrl?`<img class="${sizeClass}" src="${escapeHtml(x.imageUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:`<div class="${sizeClass}">${escapeHtml(String(x?.symbol||"?").slice(0,2))}</div>`;}
+  function alphaSourceMarkup(src={}){return Object.entries(src).map(([k,v])=>`<span class="${String(v).startsWith("ONLINE")?"on":"off"}">${escapeHtml(k.replace("GECKO_","GT "))}</span>`).join("")||"<span>NO SOURCE STATUS</span>";}
+  function alphaViewItems(){
+    let arr=[];
+    if(alphaView==="watchlist")arr=Object.values(alphaWatch);
+    else if(alphaView==="all")arr=alphaCatalog;
+    else if(alphaView==="newest")arr=alphaJustBorn.length?alphaJustBorn:(alphaOverview?.newest||[]);
+    else if(alphaView==="gainers")arr=alphaOverview?.gainers||[];
+    else if(alphaView==="volume")arr=alphaOverview?.volume||[];
+    else if(alphaView==="risk")arr=[...(alphaOverview?.trending||[]),...alphaJustBorn].sort((a,b)=>alphaQuickRisk(b)-alphaQuickRisk(a));
+    else arr=alphaOverview?.trending||[];
+    const q=String(qid("alphaSearch")?.value||"").trim().toLowerCase();if(!alphaSearchMode&&q)arr=arr.filter(x=>`${x.symbol} ${x.name} ${x.address}`.toLowerCase().includes(q));
+    const min=Math.max(0,num(qid("alphaMinLiq")?.value));const maxAge=Math.max(0,num(qid("alphaMaxAge")?.value));arr=arr.filter(x=>num(x.liquidityUsd)>=min&&(!maxAge||x.ageSeconds==null||num(x.ageSeconds)<=maxAge));
+    const sort=qid("alphaSort")?.value||"score";const value=x=>sort==="new"?(x.ageSeconds??1e15):sort==="gainers"?-num(x.priceChange?.h24):sort==="volume"?-num(x.volume?.h24):sort==="liquidity"?-num(x.liquidityUsd):-num(x.glitch?.score);arr=[...arr].sort((a,b)=>value(a)-value(b));
+    const seen=new Set();return arr.filter(x=>{const k=String(x.address||"").toLowerCase();if(!k||seen.has(k))return false;seen.add(k);return true;}).slice(0,80);
+  }
+  function renderAlphaFeed(custom=null,title=null){
+    const tbody=qid("alphaFeed");if(!tbody)return;const arr=custom||alphaViewItems();alphaFeedState=arr;
+    const titles={trending:"TRENDING_MARKETS.LOG",newest:"JUST_BORN.LIVE",gainers:"GAINERS_24H.LOG",volume:"VOLUME_LEADERS.LOG",risk:"RISK_RADAR.LOG",all:"ALL_TOKENS.DB",watchlist:"WATCHLIST.DB"};qid("alphaFeedTitle").textContent=title||titles[alphaView]||"TOKEN_SEARCH.LOG";qid("alphaFeedCount").textContent=`${arr.length} RESULTS`;
+    if(!arr.length){tbody.innerHTML='<tr><td colspan="5"><div class="alpha-empty">NO TOKENS MATCH CURRENT FILTERS.</div></td></tr>';return;}
+    tbody.innerHTML=arr.map(x=>{const ch=num(x.priceChange?.h24);const risk=alphaQuickRisk(x);const score=num(x.glitch?.score);return `<tr class="alpha-row ${alphaSelected?.address===x.address?"selected":""}" data-alpha-address="${escapeHtml(x.address)}"><td><div class="alpha-token">${alphaImg(x)}<div><b>${escapeHtml(x.symbol||"TOKEN")}</b><small>${escapeHtml(x.name||"")} // ${escapeHtml(x.quoteSymbol||x.dexId||x.source||"")}</small></div></div></td><td class="alpha-num"><b>${alphaMoney(x.priceUsd)}</b><small class="alpha-change ${alphaChangeClass(ch)}">${alphaPct(ch)}</small></td><td class="alpha-num"><b>${alphaMoney(x.liquidityUsd)}</b><small>${alphaAge(x.ageSeconds)} OLD</small></td><td class="alpha-num"><b>${alphaMoney(x.volume?.h24)}</b><small>${num(x.txns?.h24?.buys)+num(x.txns?.h24?.sells)} TX</small></td><td><span class="alpha-score ${alphaScoreClass(score)}">${score||"--"}</span>${risk>=30?`<small class="alpha-risk ${risk>=55?"high":"medium"}" style="display:block;margin-top:3px">RISK ${risk}</small>`:""}</td></tr>`}).join("");
+    tbody.querySelectorAll("[data-alpha-address]").forEach(r=>r.addEventListener("click",()=>loadAlphaDetail(r.dataset.alphaAddress)));
+  }
+  function renderAlphaPulse(){
+    const el=qid("alphaPulse");if(!el)return;const arr=alphaJustBorn.slice(0,18);qid("alphaPulseState").textContent=arr.length?`${arr.length} FRESH SIGNALS`:"LIVE // QUIET";
+    el.innerHTML=arr.length?arr.map(x=>`<div class="pulse-row" data-alpha-pulse="${escapeHtml(x.address)}"><time>${alphaAge(x.ageSeconds)}</time><div><b>${escapeHtml(x.symbol||"TOKEN")}</b><small>${escapeHtml(x.signal||"NEW POOL")} // ${escapeHtml(short(x.address))}</small></div><span class="pulse-tag">${x.pairAddress?"MARKET":"MINT"}</span></div>`).join(""):'<div class="result-empty">NO FRESH TOKEN SIGNAL IN THE CURRENT BLOCK WINDOW.<br>RADAR IS STILL LISTENING.</div>';
+    el.querySelectorAll("[data-alpha-pulse]").forEach(r=>r.addEventListener("click",()=>loadAlphaDetail(r.dataset.alphaPulse)));
+  }
+  function saveAlphaWatch(){localStorage.setItem(ALPHA_WATCH_STORE,JSON.stringify(alphaWatch));renderAlphaWatchlist();if(alphaView==="watchlist")renderAlphaFeed();}
+  function renderAlphaWatchlist(){const el=qid("alphaWatchlist");if(!el)return;const arr=Object.values(alphaWatch);qid("alphaWatchCount").textContent=`${arr.length} TOKENS`;el.innerHTML=arr.length?arr.slice(0,15).map(x=>`<div class="pulse-row" data-alpha-watch-open="${escapeHtml(x.address)}"><time>${escapeHtml(x.symbol||"TOKEN")}</time><div><b>${escapeHtml(x.name||x.symbol||"Token")}</b><small>${escapeHtml(short(x.address))}</small></div><button data-alpha-unwatch="${escapeHtml(x.address)}" style="border:1px solid #343430;background:#090909;color:#777;padding:5px;font-size:6px">REMOVE</button></div>`).join(""):'<div class="result-empty">NO TOKENS WATCHED YET.</div>';
+    el.querySelectorAll("[data-alpha-watch-open]").forEach(r=>r.addEventListener("click",e=>{if(e.target.closest("[data-alpha-unwatch]"))return;loadAlphaDetail(r.dataset.alphaWatchOpen)}));el.querySelectorAll("[data-alpha-unwatch]").forEach(b=>b.addEventListener("click",()=>{delete alphaWatch[b.dataset.alphaUnwatch.toLowerCase()];saveAlphaWatch();}));}
+  async function loadAlphaOverview(silent=false){
+    if(!qid("alphaPage"))return;try{if(!silent){qid("alphaSources").innerHTML="<span>SYNCING SOURCES...</span>";}const j=await api("/api/alpha?mode=overview");alphaOverview=j;qid("alphaMarketCount").textContent=compact(j.count||0);qid("alphaHotCount").textContent=(j.trending||[]).filter(x=>num(x.glitch?.score)>=88).length;qid("alphaSources").innerHTML=alphaSourceMarkup(j.sources);if(!alphaSearchMode&&alphaView!=="newest"&&alphaView!=="watchlist")renderAlphaFeed();}catch(e){qid("alphaSources").innerHTML=`<span class="off">RADAR ERROR // ${escapeHtml(e.message||e)}</span>`;if(!silent)qid("alphaFeed").innerHTML=`<tr><td colspan="5"><div class="alpha-empty">ALPHA OVERVIEW FAILED // ${escapeHtml(e.message||e)}<br>DIRECT CONTRACT SEARCH AND ONCHAIN PULSE MAY STILL WORK.</div></td></tr>`;}}
+  async function loadAlphaCatalog(silent=false){
+    if(!qid("alphaPage"))return;try{const j=await api("/api/alpha?mode=catalog");alphaCatalog=j.items||[];if(!silent&&alphaView==="all")renderAlphaFeed();}catch(e){if(!silent&&alphaView==="all")qid("alphaFeed").innerHTML=`<tr><td colspan="5"><div class="alpha-empty">TOKEN CATALOG ERROR // ${escapeHtml(e.message||e)}</div></td></tr>`;}}
+  async function loadAlphaJustBorn(silent=false){
+    if(!qid("alphaPage"))return;try{const j=await api("/api/alpha?mode=justborn");alphaJustBorn=j.items||[];qid("alphaNewCount").textContent=alphaJustBorn.length;qid("alphaBlock").textContent=j.latestBlock?Number(j.latestBlock).toLocaleString():"--";renderAlphaPulse();if(!alphaSearchMode&&alphaView==="newest")renderAlphaFeed();}catch(e){if(!silent)qid("alphaPulse").innerHTML=`<div class="result-empty">ONCHAIN PULSE ERROR // ${escapeHtml(e.message||e)}</div>`;}}
+  async function alphaSearch(){
+    const q=String(qid("alphaSearch")?.value||"").trim();if(!q){alphaSearchMode=false;renderAlphaFeed();return;}alphaSearchMode=true;qid("alphaFeedTitle").textContent="DEEP_SEARCH.RUN";qid("alphaFeed").innerHTML='<tr><td colspan="5"><div class="alpha-empty"><div class="loading-bar"><i></i></div><br>SEARCHING DEX + BLOCKSCOUT...</div></td></tr>';
+    try{const j=await api(`/api/alpha?mode=search&q=${encodeURIComponent(q)}`);renderAlphaFeed(j.items||[],`SEARCH // ${q.toUpperCase()}`);qid("alphaSources").innerHTML=alphaSourceMarkup(j.sources);if(addrOk(q))loadAlphaDetail(q);}catch(e){qid("alphaFeed").innerHTML=`<tr><td colspan="5"><div class="alpha-empty">SEARCH FAILED // ${escapeHtml(e.message||e)}</div></td></tr>`;}}
+  function alphaBar(name,v){return `<div class="alpha-bar"><span>${escapeHtml(name)}</span><div class="alpha-bar-track"><i style="width:${Math.max(0,Math.min(100,num(v)))}%"></i></div><b>${Math.round(num(v))}</b></div>`;}
+  function alphaChartSvg(items=[]){
+    const vals=items.map(x=>num(x.c)).filter(x=>x>0);if(vals.length<2)return '<div class="alpha-empty" style="padding:40px 5px">OHLCV NOT AVAILABLE FOR THIS MARKET.</div>';const min=Math.min(...vals),max=Math.max(...vals),span=max-min||max||1;const pts=vals.map((v,i)=>`${(i/(vals.length-1)*100).toFixed(2)},${(94-(v-min)/span*82).toFixed(2)}`).join(" ");return `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-label="price chart"><polyline points="${pts}" fill="none" stroke="#c3ff23" stroke-width="1.2" vector-effect="non-scaling-stroke"/><line x1="0" y1="94" x2="100" y2="94" stroke="#242421" stroke-width=".5"/></svg>`;
+  }
+  function securitySignal(label,value,bad=false,good=false){return `<div class="security-signal"><span>${escapeHtml(label)}</span><b class="${bad?"bad":good?"good":""}">${escapeHtml(value)}</b></div>`;}
+  function renderAlphaDetail(j,chartItems=[]){
+    alphaSelected=j;const el=qid("alphaDetail"),m=j.market||{},meta=j.meta||{},g=j.glitch||{},c=g.components||{},risk=j.risk||{},sec=j.security||{},h=j.holders||{},h1=m.txns?.h1||{},h24=m.txns?.h24||{};const watched=!!alphaWatch[j.address];qid("alphaDetailState").textContent=`${meta.symbol||"TOKEN"} // ${risk.level||"SCANNED"}`;
+    const riskClass=num(risk.score)>=55?"high":num(risk.score)>=30?"medium":"";const created=m.ageSeconds!=null?alphaAge(m.ageSeconds):"UNKNOWN";const sourceConsensus=j.consensus?`${j.consensus.level} // ${num(j.consensus.spreadPct).toFixed(3)}% SPREAD`:"SINGLE SOURCE";
+    el.innerHTML=`<div class="alpha-token-head">${alphaImg(meta)}<div><h3>${escapeHtml(meta.symbol||"TOKEN")}</h3><small>${escapeHtml(meta.name||"ERC20")}</small><small>${escapeHtml(j.address)}</small><div class="alpha-badges"><span class="alpha-badge ${sec.verified?"good":"warn"}">${sec.verified?"VERIFIED":"UNVERIFIED"}</span><span class="alpha-badge">${escapeHtml(String(m.dexId||"NO DEX").toUpperCase())}</span><span class="alpha-badge ${risk.level==="LOW"?"good":risk.level==="MEDIUM"?"warn":"bad"}">RISK ${escapeHtml(risk.level||"--")}</span></div></div><div class="alpha-price">${alphaMoney(m.priceUsd)}<small>PRICE USD</small></div></div>
+    <div class="alpha-statgrid"><div class="alpha-stat"><small>MARKET CAP</small><b>${alphaMoney(m.marketCap)}</b></div><div class="alpha-stat"><small>FDV</small><b>${alphaMoney(m.fdv)}</b></div><div class="alpha-stat"><small>LIQUIDITY</small><b>${alphaMoney(m.liquidityUsd)}</b></div><div class="alpha-stat"><small>HOLDERS</small><b>${compact(h.count)}</b></div><div class="alpha-stat"><small>VOL 24H</small><b>${alphaMoney(m.volume?.h24)}</b></div><div class="alpha-stat"><small>TX 24H</small><b>${compact(num(h24.buys)+num(h24.sells))}</b></div><div class="alpha-stat"><small>MARKET AGE</small><b>${created}</b></div><div class="alpha-stat"><small>PAIR</small><b>${escapeHtml(short(m.pairAddress||"--"))}</b></div></div>
+    <div class="alpha-timeframes">${["m5","h1","h6","h24"].map(k=>`<div class="alpha-tf"><small>${k.toUpperCase()}</small><b class="alpha-change ${alphaChangeClass(m.priceChange?.[k])}">${alphaPct(m.priceChange?.[k])}</b></div>`).join("")}</div>
+    <div class="alpha-chart"><span class="alpha-chart-label">LIVE OHLCV // 1M</span>${alphaChartSvg(chartItems)}</div>
+    <div class="alpha-section"><div class="alpha-section-title"><span>GLITCH_ALPHA_SCORE</span><b>${escapeHtml(g.verdict||"--")} // RISK ADJUSTED</b></div><div class="alpha-scoreboard"><div class="alpha-score-ring"><div><strong>${g.score??"--"}</strong><small>/ 100</small></div></div><div class="alpha-bars">${alphaBar("MOMENTUM",c.momentum)}${alphaBar("LIQUIDITY",c.liquidity)}${alphaBar("ACTIVITY",c.activity)}${alphaBar("FLOW",c.flow)}${alphaBar("NOVELTY",c.novelty)}</div></div></div>
+    <div class="alpha-section"><div class="alpha-section-title"><span>FLOW_INTELLIGENCE</span><b>${num(h1.buys)>=num(h1.sells)?"BUY PRESSURE":"SELL PRESSURE"}</b></div><div class="alpha-flow"><div><small>BUYS 1H</small><b>${compact(h1.buys)}</b></div><div><small>SELLS 1H</small><b>${compact(h1.sells)}</b></div><div><small>BUYERS 1H</small><b>${compact(h1.buyers)}</b></div><div><small>SELLERS 1H</small><b>${compact(h1.sellers)}</b></div></div></div>
+    <div class="alpha-section"><div class="alpha-section-title"><span>MARKET_STRUCTURE</span><b>${(j.pools||[]).length} POOLS OBSERVED</b></div><div class="metric-list"><div class="metric"><span>LIQUIDITY / MARKET CAP</span><b>${num(m.marketCap)>0?(num(m.liquidityUsd)/num(m.marketCap)*100).toFixed(2)+"%":"--"}</b></div><div class="metric"><span>24H VOLUME / LIQUIDITY</span><b>${num(m.liquidityUsd)>0?(num(m.volume?.h24)/num(m.liquidityUsd)).toFixed(2)+"x":"--"}</b></div><div class="metric"><span>1H BUY / SELL RATIO</span><b>${num(h1.sells)>0?(num(h1.buys)/num(h1.sells)).toFixed(2)+"x":num(h1.buys)>0?"BUY-ONLY SAMPLE":"--"}</b></div><div class="metric"><span>TOP 20 CONCENTRATION</span><b>${h.top20Pct!=null?num(h.top20Pct).toFixed(2)+"%":"--"}</b></div><div class="metric"><span>WHALE TAPE THRESHOLD</span><b>${alphaMoney(j.whaleThreshold)}</b></div></div></div>
+    <div class="alpha-section"><div class="alpha-section-title"><span>SECURITY_SIGNALS</span><b>RISK ${risk.score??"--"}/100</b></div><div class="security-grid">${securitySignal("SOURCE VERIFIED",sec.verified?"YES":"NO",!sec.verified,sec.verified)}${securitySignal("PROXY",sec.proxy?"YES":"NO",sec.proxy,!sec.proxy)}${securitySignal("OWNER",sec.owner?short(sec.owner):"NONE / UNKNOWN",false,!sec.owner)}${securitySignal("MINT ENTRYPOINT",sec.mintEntrypoint?"PRESENT":"NOT SEEN",sec.mintEntrypoint,!sec.mintEntrypoint)}${securitySignal("BLACKLIST-LIKE",sec.blacklistEntrypoint?"PRESENT":"NOT SEEN",sec.blacklistEntrypoint,!sec.blacklistEntrypoint)}${securitySignal("PAUSE ENTRYPOINT",sec.pauseEntrypoint?"PRESENT":"NOT SEEN",sec.pauseEntrypoint,false)}${securitySignal("FEE / TAX ENTRYPOINT",sec.taxEntrypoint?"PRESENT":"NOT SEEN",false,!sec.taxEntrypoint)}${securitySignal("TOP 10",h.top10Pct!=null?`${num(h.top10Pct).toFixed(2)}%`:"UNKNOWN",num(h.top10Pct)>=60,num(h.top10Pct)<35)}</div><div class="risk-box ${riskClass}"><div class="risk-head"><span>GLITCH RISK MODEL</span><b>${escapeHtml(risk.level||"--")} // ${risk.score??"--"}</b></div><div class="risk-flags">${(risk.flags||[]).length?(risk.flags||[]).map(x=>`⚠ ${escapeHtml(x)}`).join("<br>"):"NO HIGH-SEVERITY SIGNALS DETECTED BY CURRENT MODEL."}<br>${escapeHtml(risk.note||"")}</div></div></div>
+    <div class="alpha-section"><div class="alpha-section-title"><span>HOLDER_MAP</span><b>TOP 10 // ${h.top10Pct!=null?num(h.top10Pct).toFixed(2)+"%":"--"}</b></div><div class="holder-list">${(h.top||[]).length?(h.top||[]).slice(0,12).map((x,i)=>`<div class="holder-row"><span>#${i+1}</span><b>${escapeHtml(short(x.address))}</b><span>${x.pct!=null?num(x.pct).toFixed(2)+"%":"--"}</span></div>`).join(""):'<div class="result-empty">HOLDER DATA UNAVAILABLE.</div>'}</div></div>
+    <div class="alpha-section"><div class="alpha-section-title"><span>DEPLOYER_INTELLIGENCE</span><b>${j.deployer?.address?"IDENTIFIED":"UNKNOWN"}</b></div><div class="metric-list"><div class="metric"><span>CREATOR / DEPLOYER</span><b>${escapeHtml(j.deployer?.address?short(j.deployer.address):"--")}</b></div><div class="metric"><span>CREATOR TOP-HOLDER SHARE</span><b>${h.creatorPct!=null?num(h.creatorPct).toFixed(3)+"%":"OUTSIDE TOP SAMPLE / UNKNOWN"}</b></div><div class="metric"><span>CONTRACT NAME</span><b>${escapeHtml(sec.contractName||"--")}</b></div><div class="metric"><span>SOURCE CONSENSUS</span><b>${escapeHtml(sourceConsensus)}</b></div></div></div>
+    <div class="alpha-section"><div class="alpha-section-title"><span>WHALE_TAPE</span><b>${(j.whales||[]).length} DETECTED</b></div><div class="trade-list">${(j.trades||[]).length?(j.trades||[]).slice(0,18).map(t=>`<div class="trade-row"><span class="trade-kind ${String(t.kind).toLowerCase()}">${escapeHtml(t.kind||"SWAP")}</span><b>${escapeHtml(short(t.wallet||"--"))}</b><span>${alphaMoney(t.volumeUsd)}</span></div>`).join(""):'<div class="result-empty">TRADE TAPE UNAVAILABLE FOR THIS POOL.</div>'}</div></div>
+    <div class="alpha-section"><div class="alpha-section-title"><span>DATA_FUSION</span><div class="alpha-source-status">${alphaSourceMarkup(j.sources)}</div></div>${j.consensus?.sources?.length?`<div class="metric-list">${j.consensus.sources.map(x=>`<div class="metric"><span>${escapeHtml(x.source)}</span><b>${alphaMoney(x.price)}</b></div>`).join("")}</div>`:"<div class='source-line'>ONLY ONE PRICED SOURCE AVAILABLE. ALPHA WILL KEEP CROSS-CHECKING AS MORE SOURCES INDEX THIS MARKET.</div>"}</div>
+    <div class="alpha-actions"><button id="alphaWatchBtn" class="${watched?"watch-on":""}">${watched?"◉ WATCHING":"○ WATCH TOKEN"}</button><button id="alphaTradeBtn" class="primary" ${m.priceUsd?"":"disabled"}>LOAD INTO ROUTER</button><a href="${EXPLORER}/token/${encodeURIComponent(j.address)}" target="_blank" rel="noopener">BLOCKSCOUT ↗</a>${m.pairAddress?`<a href="https://dexscreener.com/robinhood/${encodeURIComponent(m.pairAddress)}" target="_blank" rel="noopener">DEX VIEW ↗</a>`:'<a href="#" style="pointer-events:none;opacity:.4">NO MARKET</a>'}</div>`;
+    qid("alphaWatchBtn")?.addEventListener("click",()=>{if(alphaWatch[j.address])delete alphaWatch[j.address];else alphaWatch[j.address]={address:j.address,symbol:meta.symbol,name:meta.name,imageUrl:meta.imageUrl,priceUsd:m.priceUsd,liquidityUsd:m.liquidityUsd,marketCap:m.marketCap,fdv:m.fdv,volume:m.volume,priceChange:m.priceChange,txns:m.txns,ageSeconds:m.ageSeconds,pairAddress:m.pairAddress,dexId:m.dexId,quoteSymbol:m.quoteSymbol,glitch:j.glitch};saveAlphaWatch();renderAlphaDetail(j,chartItems);});
+    qid("alphaTradeBtn")?.addEventListener("click",()=>{const token={address:j.address,symbol:meta.symbol||"TOKEN",name:meta.name||"Token",decimals:num(meta.decimals,18)};const usd=String(m.quoteSymbol||"").toUpperCase().includes("USD");loadIntoRouter(usd?TOKENS.USDG:TOKENS.ETH,token,usd?"100":"0.01");});
+    renderAlphaFeed();
+  }
+  async function loadAlphaDetail(address){
+    if(!addrOk(address))return;alphaSelected={address:address.toLowerCase()};renderAlphaFeed();qid("alphaDetailState").textContent="DEEP SCANNING...";qid("alphaDetail").innerHTML='<div class="alpha-empty"><div class="loading-bar"><i></i></div><br>DEX + RPC + BLOCKSCOUT + HOLDER + SECURITY + TRADE ANALYSIS...</div>';
+    try{const j=await api(`/api/alpha?mode=detail&address=${encodeURIComponent(address)}`);let chart=[];if(j.market?.pairAddress){try{const c=await api(`/api/alpha?mode=ohlcv&pool=${encodeURIComponent(j.market.pairAddress)}&timeframe=minute`);chart=c.items||[];}catch{}}renderAlphaDetail(j,chart);}catch(e){qid("alphaDetailState").textContent="SCAN ERROR";qid("alphaDetail").innerHTML=`<div class="alpha-empty">TOKEN INTELLIGENCE FAILED // ${escapeHtml(e.message||e)}<br><br>THE TOKEN MAY HAVE NO INDEXED MARKET YET. ONCHAIN DISCOVERY CAN STILL SHOW IT IN JUST BORN.</div>`;}
+  }
+  function setAlphaView(view){alphaView=view;alphaSearchMode=false;qid("alphaSearch").value="";document.querySelectorAll(".alpha-tab").forEach(x=>x.classList.toggle("active",x.dataset.alphaView===view));if(view==="newest"&&!alphaJustBorn.length)loadAlphaJustBorn();if(view==="all"&&!alphaCatalog.length)loadAlphaCatalog();renderAlphaFeed();}
+  function initAlpha(){
+    if(!qid("alphaPage"))return;renderAlphaWatchlist();document.querySelectorAll(".alpha-tab").forEach(b=>b.addEventListener("click",()=>setAlphaView(b.dataset.alphaView)));qid("alphaSearchBtn")?.addEventListener("click",alphaSearch);qid("alphaSearch")?.addEventListener("keydown",e=>{if(e.key==="Enter")alphaSearch();});qid("alphaSearch")?.addEventListener("input",()=>{if(!qid("alphaSearch").value.trim()){alphaSearchMode=false;renderAlphaFeed();}});[qid("alphaMinLiq"),qid("alphaMaxAge"),qid("alphaSort")].forEach(x=>x?.addEventListener("change",()=>renderAlphaFeed()));qid("alphaLiveBtn")?.addEventListener("click",()=>{alphaLive=!alphaLive;qid("alphaLiveBtn").classList.toggle("on",alphaLive);qid("alphaLiveBtn").textContent=alphaLive?"● LIVE":"○ PAUSED";qid("alphaLiveState").textContent=alphaLive?"ON":"PAUSED";qid("alphaLiveState").classList.toggle("acid",alphaLive);});
+    setInterval(()=>{if(alphaLive&&qid("alphaPage")?.classList.contains("active"))loadAlphaJustBorn(true);},8000);setInterval(()=>{if(alphaLive&&qid("alphaPage")?.classList.contains("active"))loadAlphaOverview(true);},30000);
+  }
+
+  function updateRotateViz(){stockVisual(qid("rotateSellViz"),qid("rotateSell")?.value);stockVisual(qid("rotateBuyViz"),qid("rotateBuy")?.value);}
+  async function analyzeRotation(){
+    const box=qid("rotateResult"),metrics=qid("rotateMetrics"),btn=qid("rotateTradeBtn");if(!box)return;
+    const a=qid("rotateSell").value,b=qid("rotateBuy").value,amount=num(qid("rotateAmount").value);if(a===b||!(amount>0)){box.innerHTML='<div class="result-empty">SELECT TWO DIFFERENT STOCK TOKENS.</div>';return;}
+    if(!account||!holderState.eligible){box.innerHTML='<div class="result-empty">CONNECT A DEAD PIXELS HOLDER WALLET TO ANALYZE EXECUTION.</div>';return;}
+    box.innerHTML='<div class="loading-bar"><i></i></div>';btn.disabled=true;
+    try{
+      const [m,q]=await Promise.all([api(`/api/stocks?action=scan&symbols=${encodeURIComponent(a+","+b)}`),api(`/api/quote?sellToken=${encodeURIComponent(stockToken(a).address)}&buyToken=${encodeURIComponent(stockToken(b).address)}&sellAmount=${encodeURIComponent(parseUnits(String(amount),18))}&taker=${encodeURIComponent(account)}&slippageBps=50&provider=all`)]);
+      const ma=(m.items||[]).find(x=>x.symbol===a),mb=(m.items||[]).find(x=>x.symbol===b),best=(q.quotes||[])[0];if(!ma||!mb||!best)throw new Error("NO EXECUTABLE ROTATION");
+      const expected=amount*ma.market.fairValue/mb.market.fairValue,actual=num(formatUnits(best.buyAmount,18)),shortfall=(1-actual/expected)*100,adverse=Math.max(0,shortfall),gas=num(best.gasUsd),notional=amount*ma.market.fairValue;
+      const score=Math.max(0,Math.min(100,Math.round(100-adverse*42-(notional>0?gas/notional*100*25:0))));rotateAnalysis={a,b,amount,expected,actual,shortfall,adverse,gas,score,best};
+      const shield=num(qid("rotateShield").value,.3),pass=adverse<=shield;
+      box.innerHTML=`<div class="result-head"><b>${escapeHtml(a)} → ${escapeHtml(b)}</b><span>GLITCH SCORE ${score}/100</span></div><div class="metric-list"><div class="metric"><span>FAIR CROSS OUTPUT</span><b>${expected.toFixed(6)} ${escapeHtml(b)}</b></div><div class="metric"><span>EXECUTABLE OUTPUT</span><b>${actual.toFixed(6)} ${escapeHtml(b)}</b></div><div class="metric ${pass?"good":"bad"}"><span>EXECUTION SHORTFALL</span><b>${pct(shortfall)}</b></div><div class="metric"><span>EST. USER GAS</span><b>${money(gas)}</b></div></div><div class="shield ${pass?"pass":"block"}"><div class="shield-head"><span>FAIR VALUE SHIELD</span><b>${pass?"PASS":"BLOCKED"}</b></div><small>MAX ${shield.toFixed(3)}% // ADVERSE ${adverse.toFixed(3)}%</small></div>`;
+      metrics.innerHTML=`<div class="metric"><span>${escapeHtml(a)} FAIR VALUE</span><b>${money(ma.market.fairValue)}</b></div><div class="metric"><span>${escapeHtml(b)} FAIR VALUE</span><b>${money(mb.market.fairValue)}</b></div><div class="metric"><span>POSITION VALUE</span><b>${money(notional)}</b></div><div class="metric"><span>ROUTE</span><b>${escapeHtml(best.label||"--")}</b></div><div class="metric"><span>PROTOCOL FEE</span><b>0%</b></div>`;
+      btn.disabled=!pass;
+    }catch(e){box.innerHTML=`<div class="result-empty">ROTATION ERROR // ${escapeHtml(e.message||e)}</div>`;}
+  }
+
+  function freshPortfolioDefaults(){const pref=["NVDA","AAPL","MSFT","GOOGL"].filter(x=>stockBySymbol(x));const fallback=stockRegistry.slice(0,4).map(x=>x.symbol);const syms=[...new Set([...pref,...fallback])].slice(0,4);const weights=[35,25,25,15];portfolioRowsState=syms.map((symbol,i)=>({id:Date.now()+i,symbol,weight:weights[i]||0}));}
+  function renderPortfolioRows(){
+    const el=qid("portfolioRows");if(!el||!stockRegistry.length)return;if(!portfolioRowsState.length)freshPortfolioDefaults();
+    el.innerHTML=portfolioRowsState.map((r,i)=>`<div class="portfolio-row" data-row="${r.id}"><label class="field"><small>ASSET ${i+1}</small><select class="portal-select portfolio-symbol">${stockRegistry.map(x=>`<option value="${escapeHtml(x.symbol)}" ${x.symbol===r.symbol?"selected":""}>${escapeHtml(x.symbol)} // ${escapeHtml(x.name)}</option>`).join("")}</select></label><label class="field"><small>TARGET %</small><input class="portal-input portfolio-weight" value="${r.weight}" inputmode="decimal"></label><button class="remove-row" title="Remove">×</button></div>`).join("");
+    el.querySelectorAll("[data-row]").forEach(row=>{const id=Number(row.dataset.row),st=portfolioRowsState.find(x=>x.id===id);row.querySelector(".portfolio-symbol").addEventListener("change",e=>{st.symbol=e.target.value;});row.querySelector(".portfolio-weight").addEventListener("input",e=>{st.weight=num(e.target.value);updateWeightSum();});row.querySelector(".remove-row").addEventListener("click",()=>{portfolioRowsState=portfolioRowsState.filter(x=>x.id!==id);renderPortfolioRows();});});updateWeightSum();
+  }
+  function updateWeightSum(){const sum=portfolioRowsState.reduce((a,x)=>a+num(x.weight),0);if(qid("weightSum")){qid("weightSum").textContent=`${sum.toFixed(2)}%`;qid("weightSum").style.color=Math.abs(sum-100)<.01?"var(--acid)":"#ff6680";}}
+  function validPortfolio(){const sum=portfolioRowsState.reduce((a,x)=>a+num(x.weight),0);if(Math.abs(sum-100)>.01)throw new Error("TARGET WEIGHTS MUST TOTAL 100%");const unique=new Set(portfolioRowsState.map(x=>x.symbol));if(unique.size!==portfolioRowsState.length)throw new Error("DUPLICATE ASSET IN PORTFOLIO");if(portfolioRowsState.length<2)throw new Error("ADD AT LEAST TWO ASSETS");}
+  function renderPlan(){const el=qid("portfolioPlan");if(!el)return;qid("planCount").textContent=`${portfolioPlanState.length} STEPS`;el.innerHTML=portfolioPlanState.length?portfolioPlanState.map((x,i)=>`<div class="plan-step"><div class="step-no">${String(i+1).padStart(2,"0")}</div><div><b>${escapeHtml(x.sell.symbol)} → ${escapeHtml(x.buy.symbol)}</b><small>${escapeHtml(String(x.amount))} ${escapeHtml(x.sell.symbol)} // ~${money(x.usd)} VALUE</small></div><button data-plan-step="${i}">LOAD ROUTE</button></div>`).join(""):'<div class="result-empty">NO PORTFOLIO PLAN GENERATED.</div>';el.querySelectorAll("[data-plan-step]").forEach(b=>b.addEventListener("click",()=>{const x=portfolioPlanState[Number(b.dataset.planStep)];loadIntoRouter(x.sell,x.buy,x.amount);}));}
+  async function buildNewPortfolio(){
+    try{validPortfolio();const cap=num(qid("portfolioCapital").value);if(!(cap>0))throw new Error("INVALID CAPITAL");portfolioPlanState=portfolioRowsState.map(r=>({sell:TOKENS.USDG,buy:stockToken(r.symbol),amount:(cap*r.weight/100).toFixed(6),usd:cap*r.weight/100,type:"BUY"}));renderPlan();qid("portfolioStatus").textContent=`NEW PORTFOLIO PLAN READY // ${money(cap)} USDG // ${portfolioPlanState.length} WALLET-CONFIRMED STEPS`;}
+    catch(e){qid("portfolioStatus").textContent=`PLAN ERROR // ${e.message||e}`;}
+  }
+  async function arbitraryBalance(t){if(!account)return 0;const data="0x70a08231"+padAddress(account);const raw=await rpc("eth_call",[{to:t.address,data},"latest"]);return num(formatUnits(BigInt(raw||"0x0"),t.decimals,12));}
+  async function rebalancePortfolio(){
+    try{
+      validPortfolio();if(!account)throw new Error("CONNECT WALLET");qid("portfolioStatus").textContent="SCANNING WALLET BALANCES + FAIR VALUES...";
+      const syms=portfolioRowsState.map(x=>x.symbol);const m=await api(`/api/stocks?action=scan&symbols=${encodeURIComponent(syms.join(","))}`);const map=new Map((m.items||[]).map(x=>[x.symbol,x]));
+      const vals=[];for(const r of portfolioRowsState){const t=stockToken(r.symbol),bal=await arbitraryBalance(t),price=map.get(r.symbol)?.market?.fairValue;if(!(price>0))throw new Error(`NO FAIR VALUE FOR ${r.symbol}`);vals.push({...r,t,balance:bal,price,value:bal*price});}
+      const total=vals.reduce((a,x)=>a+x.value,0);if(!(total>0))throw new Error("NO SELECTED STOCK TOKEN BALANCE FOUND");
+      const sellers=vals.map(x=>({...x,delta:x.value-total*x.weight/100})).filter(x=>x.delta>1).sort((a,b)=>b.delta-a.delta);const buyers=vals.map(x=>({...x,need:total*x.weight/100-x.value})).filter(x=>x.need>1).sort((a,b)=>b.need-a.need);
+      const plan=[];let si=0,bi=0;while(si<sellers.length&&bi<buyers.length){const s=sellers[si],b=buyers[bi],usd=Math.min(s.delta,b.need);if(usd<=.5)break;const amt=usd/s.price;plan.push({sell:s.t,buy:b.t,amount:amt.toFixed(10).replace(/0+$/,"").replace(/\.$/,""),usd,type:"ROTATE"});s.delta-=usd;b.need-=usd;if(s.delta<=1)si++;if(b.need<=1)bi++;}
+      portfolioPlanState=plan;renderPlan();qid("portfolioStatus").textContent=`REBALANCE READY // SELECTED VALUE ${money(total)} // ${plan.length} DIRECT ROTATION STEP${plan.length===1?"":"S"}`;
+    }catch(e){qid("portfolioStatus").textContent=`REBALANCE ERROR // ${e.message||e}`;}
+  }
+
+  function loadOrders(){try{const a=JSON.parse(localStorage.getItem(ORDER_STORE)||"[]");executionOrders=Array.isArray(a)?a.slice(0,10):[];}catch{executionOrders=[]}renderOrders();}
+  function saveOrders(){localStorage.setItem(ORDER_STORE,JSON.stringify(executionOrders));renderOrders();}
+  function orderReady(o,j){
+    if(!j)return false;const fair=num(j.fair?.value),dev=j.execution?.adverseDeviationPct==null?999:num(j.execution.adverseDeviationPct),score=num(j.glitchScore?.score),gas=j.execution?.gasUsd==null?999:num(j.execution.gasUsd);let priceOk=true;
+    if(num(o.targetPrice)>0)priceOk=o.side==="buy"?fair<=num(o.targetPrice):fair>=num(o.targetPrice);
+    return priceOk&&dev<=num(o.maxDeviation,.25)&&score>=num(o.minScore,90)&&gas<=num(o.maxGas,.25)&&!j.fair?.isTradingHalt;
+  }
+  function renderOrders(){
+    const el=qid("ordersList");if(!el)return;qid("ordersCount").textContent=`${executionOrders.length} ACTIVE`;
+    if(!executionOrders.length){el.innerHTML='<div class="result-empty">NO EXECUTION ORDERS ARMED.</div>';return;}
+    el.innerHTML=executionOrders.map(o=>{const j=o.last||{},ready=o.state==="READY";return `<div class="order-card ${ready?"ready":o.state==="ERROR"?"error":""}"><div class="order-head"><b>${escapeHtml(o.side.toUpperCase())} ${escapeHtml(o.symbol)}</b><span class="order-state">${escapeHtml(o.state||"WAITING")}</span></div><div class="order-meta"><div><small>AMOUNT</small><b>${escapeHtml(String(o.amount))} ${o.side==="buy"?"USDG":escapeHtml(o.symbol)}</b></div><div><small>FAIR PRICE</small><b>${j.fair?money(j.fair.value):"--"}</b></div><div><small>DEVIATION</small><b>${j.execution?pct(j.execution.adverseDeviationPct):"--"}</b></div><div><small>GLITCH SCORE</small><b>${j.glitchScore?.score??"--"}</b></div></div><div class="order-actions">${ready?`<button class="ready-btn" data-order-load="${o.id}">LOAD & EXECUTE</button>`:""}<button data-order-check="${o.id}">CHECK NOW</button><button data-order-cancel="${o.id}">CANCEL</button></div></div>`}).join("");
+    el.querySelectorAll("[data-order-cancel]").forEach(b=>b.addEventListener("click",()=>{executionOrders=executionOrders.filter(x=>x.id!==b.dataset.orderCancel);saveOrders();}));
+    el.querySelectorAll("[data-order-check]").forEach(b=>b.addEventListener("click",()=>checkOneOrder(executionOrders.find(x=>x.id===b.dataset.orderCheck),true)));
+    el.querySelectorAll("[data-order-load]").forEach(b=>b.addEventListener("click",()=>{const o=executionOrders.find(x=>x.id===b.dataset.orderLoad);if(!o)return;const stock=stockToken(o.symbol);loadIntoRouter(o.side==="buy"?TOKENS.USDG:stock,o.side==="buy"?stock:TOKENS.USDG,o.amount);}));
+  }
+  async function checkOneOrder(o,manual=false){
+    if(!o||!account||!holderState.eligible)return;try{o.state="CHECKING";if(manual)renderOrders();const j=await api(`/api/stocks?action=execution&symbol=${encodeURIComponent(o.symbol)}&wallet=${encodeURIComponent(account)}&side=${o.side}&amount=${encodeURIComponent(o.amount)}`);o.last=j;o.lastChecked=Date.now();o.state=orderReady(o,j)?"READY":"WAITING";saveOrders();if(o.state==="READY")qid("orderStatus").textContent=`READY // ${o.side.toUpperCase()} ${o.symbol} CONDITIONS MET // WALLET CONFIRMATION REQUIRED`;}
+    catch(e){o.state="ERROR";o.error=e.message||String(e);saveOrders();}}
+  async function checkExecutionOrders(){if(!account||!holderState.eligible||!executionOrders.length)return;for(const o of executionOrders.slice(0,6))await checkOneOrder(o,false);}
+  function armOrder(){
+    const side=qid("orderSide").value,symbol=qid("orderStock").value,amount=num(qid("orderAmount").value);if(!(amount>0))return qid("orderStatus").textContent="INVALID ORDER AMOUNT";
+    const o={id:`${Date.now()}-${Math.random().toString(16).slice(2,8)}`,side,symbol,amount,targetPrice:num(qid("orderTargetPrice").value),maxDeviation:num(qid("orderMaxDeviation").value,.25),minScore:num(qid("orderMinScore").value,90),maxGas:num(qid("orderMaxGas").value,.25),state:"WAITING",createdAt:Date.now(),last:null};executionOrders.unshift(o);executionOrders=executionOrders.slice(0,10);saveOrders();qid("orderStatus").textContent=`ARMED // ${side.toUpperCase()} ${symbol} // CHECKING EVERY ~20 SECONDS WHILE PORTAL IS OPEN`;checkOneOrder(o,true);
+  }
+
+  qid("registrySearch")?.addEventListener("input",renderRegistry);qid("scannerSearch")?.addEventListener("change",loadMarketScanner);qid("refreshScanner")?.addEventListener("click",loadMarketScanner);qid("analyzeStockBtn")?.addEventListener("click",()=>analyzeStockExecution());qid("tradeStockBtn")?.addEventListener("click",tradeSelectedStock);qid("stockAnalyzeSymbol")?.addEventListener("change",()=>{selectedStockAnalysis=null;qid("tradeStockBtn").disabled=true;});qid("stockShieldMax")?.addEventListener("change",()=>selectedStockAnalysis&&analyzeStockExecution());
+  [qid("rotateSell"),qid("rotateBuy")].forEach(e=>e?.addEventListener("change",()=>{updateRotateViz();rotateAnalysis=null;qid("rotateTradeBtn").disabled=true;}));qid("rotateAnalyzeBtn")?.addEventListener("click",analyzeRotation);qid("rotateTradeBtn")?.addEventListener("click",()=>rotateAnalysis&&loadIntoRouter(stockToken(rotateAnalysis.a),stockToken(rotateAnalysis.b),rotateAnalysis.amount));
+  qid("addPortfolioRow")?.addEventListener("click",()=>{if(portfolioRowsState.length>=8)return;const used=new Set(portfolioRowsState.map(x=>x.symbol)),next=stockRegistry.find(x=>!used.has(x.symbol));if(next){portfolioRowsState.push({id:Date.now(),symbol:next.symbol,weight:0});renderPortfolioRows();}});qid("buildPlanBtn")?.addEventListener("click",buildNewPortfolio);qid("rebalanceBtn")?.addEventListener("click",rebalancePortfolio);
+  qid("orderSide")?.addEventListener("change",()=>{qid("orderAmountLabel").textContent=qid("orderSide").value==="buy"?"AMOUNT // USDG":"AMOUNT // STOCK TOKEN";});qid("armOrderBtn")?.addEventListener("click",armOrder);
+  loadOrders();setInterval(checkExecutionOrders,20000);
+
+  els.walletBtn.addEventListener("click",connect);
+  els.actionBtn.addEventListener("click",()=>{if(!account)connect(); else if(!selectedQuote)getQuote(); else execute();});
+  els.sellAmount.addEventListener("input",()=>{selectedQuote=null;updateAction();scheduleQuote()});
+  els.slippage.addEventListener("change",()=>{selectedQuote=null;scheduleQuote(100);updateAction()});
+  els.sellToken.addEventListener("change",async()=>{updateCustomUI();selectedQuote=null;await updateBalance();scheduleQuote(120);updateAction()});
+  els.buyToken.addEventListener("change",()=>{updateCustomUI();selectedQuote=null;scheduleQuote(120);updateAction()});
+  els.sellCustom.addEventListener("change",async()=>{await resolveCustom("sell");await updateBalance();selectedQuote=null;scheduleQuote(100)});
+  els.buyCustom.addEventListener("change",async()=>{await resolveCustom("buy");selectedQuote=null;scheduleQuote(100)});
+  els.reverseBtn.addEventListener("click",reversePair);
+  els.maxBtn.addEventListener("click",async()=>{
+    try{const t=await currentToken("sell");const raw=BigInt(els.maxBtn.dataset.raw||"0");if(raw<=0n)return;
+      let use=raw;if(t.native){const reserve=50000000000000n;use=raw>reserve?raw-reserve:0n}
+      els.sellAmount.value=formatUnits(use,t.decimals,Math.min(t.decimals,10));selectedQuote=null;scheduleQuote(100);updateAction();
+    }catch{}
+  });
+  document.querySelectorAll("[data-pair]").forEach(btn=>btn.addEventListener("click",()=>{
+    document.querySelectorAll("[data-pair]").forEach(x=>x.classList.remove("active"));btn.classList.add("active");
+    const [a,b]=btn.dataset.pair.split(",");setPair(a,b);
+  }));
+
+  if(window.ethereum){
+    ethereum.on?.("accountsChanged",async a=>{account=a?.[0]||null;if(account){els.walletBtn.textContent=short(account);els.walletBtn.classList.add("connected");if(els.portalWalletBtn){els.portalWalletBtn.textContent=short(account);els.portalWalletBtn.classList.add("connected")}}else{els.walletBtn.textContent="CONNECT WALLET";els.walletBtn.classList.remove("connected");if(els.portalWalletBtn){els.portalWalletBtn.textContent="CONNECT";els.portalWalletBtn.classList.remove("connected")}}selectedQuote=null;await updateBalance();await checkHolder();updateAction();});
+    ethereum.on?.("chainChanged",()=>location.reload());
+    ethereum.request({method:"eth_accounts"}).then(async a=>{if(a?.[0]){account=a[0];els.walletBtn.textContent=short(account);els.walletBtn.classList.add("connected");if(els.portalWalletBtn){els.portalWalletBtn.textContent=short(account);els.portalWalletBtn.classList.add("connected");}await updateBalance();await checkHolder();updateAction();}}).catch(()=>{});
+  }
+  applyHolderGate();
+  updateAction();
+  loadTokenCatalog();
+  loadStockRegistry();
+  initAlpha();
+
+  // Black-hole field inherited from the original DEAD PIXELS portal identity.
+  const canvas=document.getElementById("voidCanvas"),ctx=canvas.getContext("2d",{alpha:false});
+  let w=0,h=0,dpr=1,cx=0,cy=0,r=0,tick=0;const particles=[],stars=[];
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  function resize(){
+    dpr=Math.min(devicePixelRatio||1,2);w=innerWidth;h=innerHeight;canvas.width=w*dpr;canvas.height=h*dpr;canvas.style.width=w+"px";canvas.style.height=h+"px";ctx.setTransform(dpr,0,0,dpr,0,0);
+    cx=w<940?w*.5:w*.27;cy=h*.49;r=Math.min(w,h)*(w<940?.18:.23);particles.length=stars.length=0;
+    for(let i=0;i<Math.min(850,Math.max(380,w*h/2400));i++)particles.push({a:rnd(0,Math.PI*2),rr:rnd(r*.72,r*2.35),s:rnd(.6,3),sp:rnd(.0008,.0034),o:rnd(.06,.65)});
+    for(let i=0;i<Math.round(w*h/15000);i++)stars.push({x:Math.random()*w,y:Math.random()*h,s:rnd(.4,1.6),o:rnd(.04,.32)});
+  }
+  function draw(){
+    tick++;ctx.globalAlpha=1;ctx.fillStyle="#000";ctx.fillRect(0,0,w,h);
+    for(const s of stars){ctx.globalAlpha=s.o;ctx.fillStyle="#fff";ctx.fillRect(s.x,s.y,s.s,s.s)}
+    for(const p of particles){
+      p.a+=p.sp;const warp=1+.18*Math.sin(p.a*3+tick*.005);const x=cx+Math.cos(p.a)*p.rr*warp,y=cy+Math.sin(p.a)*p.rr*.38;
+      const tangent=p.a+Math.PI/2,len=p.s*(1+1.7*(1-p.rr/(r*2.5)));ctx.globalAlpha=p.o;ctx.strokeStyle=Math.random()<.015?"#c3ff23":"#bdbdb8";ctx.lineWidth=Math.max(.4,p.s*.35);
+      ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(tangent)*len*4,y+Math.sin(tangent)*len*1.2);ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+    const g=ctx.createRadialGradient(cx,cy,r*.15,cx,cy,r*1.2);g.addColorStop(0,"#000");g.addColorStop(.34,"#000");g.addColorStop(.55,"rgba(0,0,0,.93)");g.addColorStop(.72,"rgba(0,0,0,.35)");g.addColorStop(1,"rgba(0,0,0,0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,r*1.2,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=.24;ctx.strokeStyle="#c3ff23";ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(cx,cy,r*1.08,r*.26,-.16,0,Math.PI*2);ctx.stroke();
+    requestAnimationFrame(draw);
+  }
+  addEventListener("resize",resize);resize();draw();
+})();
+</script>
+</body>
+</html>

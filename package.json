@@ -1,0 +1,11 @@
+{
+  "name": "dead-pixels-portal-v37",
+  "version": "3.7.0",
+  "private": true,
+  "engines": {
+    "node": "22.x"
+  },
+  "dependencies": {
+    "viem": "^2.37.6"
+  }
+}
