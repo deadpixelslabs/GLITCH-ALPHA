@@ -1,6 +1,6 @@
 {
   "app": "DEAD PIXELS PORTAL",
-  "version": "3.7.1",
+  "version": "3.7.2",
   "chainId": 4663,
   "protocolFeeBps": 0,
   "modules": {
@@ -11,7 +11,7 @@
     "v3.4": "PORTFOLIO BUILDER + REBALANCER",
     "v3.5": "WAIT FOR BETTER + EXECUTION ORDERS",
     "v3.6": "ANALYTICS (PERSISTENT BUILD EXISTS SEPARATELY)",
-    "v3.7.1": "GLITCH ALPHA // QUALIFIED RANKINGS + PAGINATED CATALOG + SCORE V2"
+    "v3.7.2": "GLITCH ALPHA // PAIR-AWARE RANKINGS + HOLDER FIX + CANONICAL SCORE"
   },
   "glitchAlpha": {
     "scope": "ALL ERC-20 TOKENS ON ROBINHOOD CHAIN",

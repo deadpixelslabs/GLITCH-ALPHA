@@ -1,6 +1,6 @@
-# DEAD PIXELS PORTAL V3.7.1 — GLITCH ALPHA
+# DEAD PIXELS PORTAL V3.7.2 — GLITCH ALPHA
 
-V3.7.1 keeps the existing DEAD PIXELS corrupted-terminal UI and the complete V3.5.2 execution stack, then adds **GLITCH ALPHA**, a universal Robinhood Chain token-intelligence module.
+V3.7.2 keeps the existing DEAD PIXELS corrupted-terminal UI and the complete V3.5.2 execution stack, then adds **GLITCH ALPHA**, a universal Robinhood Chain token-intelligence module.
 
 ## Portal modules
 
@@ -14,19 +14,21 @@ V3.7.1 keeps the existing DEAD PIXELS corrupted-terminal UI and the complete V3.
 07 GLITCH PAD    coming soon
 ```
 
-## V3.7.1 GLITCH ALPHA
-### V3.7.1 ranking corrections
+## V3.7.2 GLITCH ALPHA
+### V3.7.2 ranking corrections
 
-- **ALL TOKENS** uses Blockscout cursor pagination with a **LOAD MORE TOKENS** control instead of being limited to one page.
-- Switching to **ALL TOKENS** resets the market-age filter to `ANY AGE`, so an old-token catalog is not accidentally filtered by a previous JUST BORN setting.
-- **VOLUME** only includes qualified markets (`>= $10K liquidity`, `>= $25K 24h volume`, `>= 25 tx/24h`) before ranking.
-- **GAINERS** also requires minimum liquidity/activity to prevent dust-pool percentage spikes from dominating.
-- Market stats are aggregated across unique observed pools per token before scoring.
-- GLITCH Alpha Score V2 reduces the old over-reward for tiny fresh pumps and adds market maturity + liquidity/FDV structure.
-- The official `$GLITCH` contract is pinned for discovery and receives an **OFFICIAL DEAD PIXELS** badge, but **does not receive a fake score bonus**. Its score remains market-data driven.
-- Blockscout token-info + smart-contract V2 endpoints are used for more reliable holder counts and verification state.
-- Missing market cap is shown as `--`, not `$0`.
-
+- **PAIR-AWARE TRENDING**: feeds are ranked as actual DEX markets/pairs instead of collapsing every pair into a token-wide aggregate. A meme paired against a Robinhood Stock Token now displays the meme as the subject, e.g. `ARTIFICIAL INU / NVDA`, rather than incorrectly labelling the market as NVDA.
+- Robinhood Stock Tokens are recognized dynamically from the official stock registry, with a token-name fallback when the registry is temporarily unavailable.
+- **ONE CANONICAL GLITCH ALPHA SCORE**: feed and detail both use the selected market-pair score. Holder/security enrichment no longer silently changes the score after clicking a row; those signals remain in separate **RISK** and **CONFIDENCE** models.
+- Detail requests carry the exact pair + source from the selected row, and the loaded detail snapshot is synchronized back into the visible row.
+- **HOLDERS FIX**: Blockscout holder count now takes the best positive value from token counters, token info, address-token info, and search fallback instead of letting a temporary string `"0"` override valid counts. If an exact count is unavailable but a holder page is available, ALPHA displays a sampled `N+` value instead of a fake zero.
+- Blockscout requests have a small retry path for `429`/transient `5xx` responses.
+- Quote-side markets are normalized correctly (price movement and buy/sell direction are inverted when the tracked token is the pool quote token), and OHLCV requests use the correct base/quote side.
+- Uniswap v4 **bytes32 Pool IDs** are accepted throughout detail selection, trade tape, OHLCV and DEX links; they are not rejected as if they had to be 20-byte contract addresses.
+- **ALL TOKENS** keeps Blockscout cursor pagination with **LOAD MORE TOKENS** and `ANY AGE` defaults.
+- **VOLUME** remains qualified (`>= $10K liquidity`, `>= $25K 24h volume`, `>= 25 tx/24h`) before ranking; **GAINERS** also requires minimum liquidity/activity.
+- The official `$GLITCH` contract remains pinned for discovery with an **OFFICIAL DEAD PIXELS** badge, but receives no artificial score bonus.
+- Missing market cap remains `--`, never a fabricated `$0`.
 
 ALPHA is built for memes, Stock Tokens, stablecoins, utility tokens, old tokens and newly appearing ERC-20s on Robinhood Chain.
 
@@ -87,7 +89,7 @@ JUST BORN / onchain pulse  ~8 seconds while ALPHA is open
 market overview            ~30 seconds while ALPHA is open
 ```
 
-GeckoTerminal's public API may itself cache data. V3.7.1 also caches aggregator responses server-side so the ~8 second JUST BORN pulse does not repeatedly hammer a rate-limited market API; direct onchain discovery remains separate from that cache.
+GeckoTerminal's public API may itself cache data. V3.7.2 also caches aggregator responses server-side so the ~8 second JUST BORN pulse does not repeatedly hammer a rate-limited market API; direct onchain discovery remains separate from that cache.
 
 This build defaults to the official public Robinhood Chain RPC in `RH_RPC_URL`, so no Alchemy key is required. Public RPC rate limits can still apply under heavy traffic; the rest of ALPHA uses caching and external indexed sources to reduce RPC load.
 
@@ -144,7 +146,7 @@ For reliable ALPHA production use, replace the public RPC value with your dedica
 4. In **Vercel → Project → Settings → Environment Variables**, keep your existing `UNISWAP_API_KEY` and `LIFI_API_KEY` if used.
 5. Add/update `RH_RPC_URL` with your production Robinhood Chain RPC. Public RPC works as a fallback for testing.
 6. Deploy.
-7. Open `/api/health` and confirm the app reports `DEAD PIXELS PORTAL V3.7.1`.
+7. Open `/api/health` and confirm the app reports `DEAD PIXELS PORTAL V3.7.2`.
 8. Open Portal → **02 ALPHA**.
 9. Test `JUST BORN`, search `$GLITCH`, and open a token detail page.
 10. Connect a DEAD PIXELS holder wallet and test `LOAD INTO ROUTER` with a tiny amount before announcing production.

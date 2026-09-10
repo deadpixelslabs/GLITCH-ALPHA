@@ -20,7 +20,7 @@ module.exports=async function handler(req,res){
 
   res.status(200).json({
     ok:true,
-    app:"DEAD PIXELS PORTAL V3.7.1 // GLITCH ALPHA + UNIFIED EXECUTION OS",
+    app:"DEAD PIXELS PORTAL V3.7.2 // GLITCH ALPHA + UNIFIED EXECUTION OS",
     chainId:4663,
     protocolFeeBps:0,
     holderGate:{enabled:true,minimumNFTs:1,nftContract:"0x27390fe7ae676fbfdb632e61cd4019996b07892c",enforcement:"SERVER_SIDE_EXECUTABLE_QUOTE_GATE"},
@@ -35,7 +35,7 @@ module.exports=async function handler(req,res){
       v34Rebalancer:true,
       v35WaitForBetter:true,
       v35ExecutionOrders:"CLIENT_WATCH_WALLET_CONFIRMATION",
-      v371GlitchAlpha:{enabled:true,scope:"UNIVERSAL_ERC20",directOnchainDiscovery:true,historicalSearch:true,multiSource:true,paginatedCatalog:true,qualifiedVolume:true,aggregatedPools:true,scoreModel:"V3.7.1"}
+      v372GlitchAlpha:{enabled:true,scope:"UNIVERSAL_ERC20",directOnchainDiscovery:true,historicalSearch:true,multiSource:true,paginatedCatalog:true,qualifiedVolume:true,pairLevelRankings:true,canonicalPairScore:true,holderFallbacks:true,scoreModel:"V3.7.2"}
     },
     routing:{uniswapOfficial,uniswapRobinhood4663:robinhoodSupported,uniswapX:"via BEST_PRICE when eligible",nordsternDirect:true,lifi:true,directWrap:true},
     universalRouterVersion:"2.1.1",
