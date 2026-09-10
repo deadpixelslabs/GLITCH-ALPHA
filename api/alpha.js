@@ -5,7 +5,7 @@ module.exports=async function handler(req,res){
   try{
     const mode=String(req.query?.mode||"overview").toLowerCase();
     if(mode==="overview")return json(res,200,await alpha.overview());
-    if(mode==="catalog")return json(res,200,await alpha.catalog());
+    if(mode==="catalog")return json(res,200,await alpha.catalog(req.query?.cursor));
     if(mode==="search")return json(res,200,await alpha.search(req.query?.q));
     if(mode==="justborn")return json(res,200,await alpha.justBorn());
     if(mode==="detail")return json(res,200,await alpha.detail(req.query?.address));

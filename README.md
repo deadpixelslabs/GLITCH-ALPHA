@@ -1,6 +1,6 @@
-# DEAD PIXELS PORTAL V3.7 — GLITCH ALPHA
+# DEAD PIXELS PORTAL V3.7.1 — GLITCH ALPHA
 
-V3.7 keeps the existing DEAD PIXELS corrupted-terminal UI and the complete V3.5.2 execution stack, then adds **GLITCH ALPHA**, a universal Robinhood Chain token-intelligence module.
+V3.7.1 keeps the existing DEAD PIXELS corrupted-terminal UI and the complete V3.5.2 execution stack, then adds **GLITCH ALPHA**, a universal Robinhood Chain token-intelligence module.
 
 ## Portal modules
 
@@ -14,7 +14,19 @@ V3.7 keeps the existing DEAD PIXELS corrupted-terminal UI and the complete V3.5.
 07 GLITCH PAD    coming soon
 ```
 
-## V3.7 GLITCH ALPHA
+## V3.7.1 GLITCH ALPHA
+### V3.7.1 ranking corrections
+
+- **ALL TOKENS** uses Blockscout cursor pagination with a **LOAD MORE TOKENS** control instead of being limited to one page.
+- Switching to **ALL TOKENS** resets the market-age filter to `ANY AGE`, so an old-token catalog is not accidentally filtered by a previous JUST BORN setting.
+- **VOLUME** only includes qualified markets (`>= $10K liquidity`, `>= $25K 24h volume`, `>= 25 tx/24h`) before ranking.
+- **GAINERS** also requires minimum liquidity/activity to prevent dust-pool percentage spikes from dominating.
+- Market stats are aggregated across unique observed pools per token before scoring.
+- GLITCH Alpha Score V2 reduces the old over-reward for tiny fresh pumps and adds market maturity + liquidity/FDV structure.
+- The official `$GLITCH` contract is pinned for discovery and receives an **OFFICIAL DEAD PIXELS** badge, but **does not receive a fake score bonus**. Its score remains market-data driven.
+- Blockscout token-info + smart-contract V2 endpoints are used for more reliable holder counts and verification state.
+- Missing market cap is shown as `--`, not `$0`.
+
 
 ALPHA is built for memes, Stock Tokens, stablecoins, utility tokens, old tokens and newly appearing ERC-20s on Robinhood Chain.
 
@@ -75,9 +87,9 @@ JUST BORN / onchain pulse  ~8 seconds while ALPHA is open
 market overview            ~30 seconds while ALPHA is open
 ```
 
-GeckoTerminal's public API may itself cache data. V3.7 also caches aggregator responses server-side so the ~8 second JUST BORN pulse does not repeatedly hammer a rate-limited market API; direct onchain discovery remains separate from that cache.
+GeckoTerminal's public API may itself cache data. V3.7.1 also caches aggregator responses server-side so the ~8 second JUST BORN pulse does not repeatedly hammer a rate-limited market API; direct onchain discovery remains separate from that cache.
 
-For production, use a dedicated Robinhood Chain RPC/archive provider in `RH_RPC_URL`. The public Robinhood RPC is a fallback and can be rate-limited.
+This build defaults to the official public Robinhood Chain RPC in `RH_RPC_URL`, so no Alchemy key is required. Public RPC rate limits can still apply under heavy traffic; the rest of ALPHA uses caching and external indexed sources to reduce RPC load.
 
 ## Existing execution core preserved
 
@@ -132,7 +144,7 @@ For reliable ALPHA production use, replace the public RPC value with your dedica
 4. In **Vercel → Project → Settings → Environment Variables**, keep your existing `UNISWAP_API_KEY` and `LIFI_API_KEY` if used.
 5. Add/update `RH_RPC_URL` with your production Robinhood Chain RPC. Public RPC works as a fallback for testing.
 6. Deploy.
-7. Open `/api/health` and confirm the app reports `DEAD PIXELS PORTAL V3.7`.
+7. Open `/api/health` and confirm the app reports `DEAD PIXELS PORTAL V3.7.1`.
 8. Open Portal → **02 ALPHA**.
 9. Test `JUST BORN`, search `$GLITCH`, and open a token detail page.
 10. Connect a DEAD PIXELS holder wallet and test `LOAD INTO ROUTER` with a tiny amount before announcing production.
